@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Yazar Yönetimi</h1>
+    <a href="{{ url_for('kitaplar.yeni_yazar') }}" class="btn btn-primary">Yeni Yazar Ekle</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Ad</th>
+                        <th>Soyad</th>
+                        <th>Biyografi</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for yazar in yazarlar %}
+                    <tr>
+                        <td>{{ yazar.YazarID }}</td>
+                        <td>{{ yazar.Ad }}</td>
+                        <td>{{ yazar.Soyad }}</td>
+                        <td>{{ yazar.Biyografi[:50] + '...' if yazar.Biyografi and yazar.Biyografi|length > 50 else yazar.Biyografi }}</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{{ url_for('kitaplar.duzenle_yazar', id=yazar.YazarID) }}" class="btn btn-sm btn-warning">Düzenle</a>
+                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#silModal{{ yazar.YazarID }}">Sil</button>
+                            </div>
+                            
+                            <!-- Silme Onay Modalı -->
+                            <div class="modal fade" id="silModal{{ yazar.YazarID }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Silme Onayı</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>"{{ yazar.Ad }} {{ yazar.Soyad }}" yazarını silmek istediğinize emin misiniz?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                                            <form action="{{ url_for('kitaplar.sil_yazar', id=yazar.YazarID) }}" method="post">
+                                                <button type="submit" class="btn btn-danger">Sil</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

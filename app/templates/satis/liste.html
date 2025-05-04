@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Satış Listesi</h1>
+    <a href="{{ url_for('satis.yeni') }}" class="btn btn-primary">Yeni Satış</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if satislar.items %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Satış ID</th>
+                        <th>Tarih</th>
+                        <th>Müşteri</th>
+                        <th>Tutar</th>
+                        <th>Personel</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for satis in satislar.items %}
+                    <tr>
+                        <td>{{ satis.SatisID }}</td>
+                        <td>{{ satis.SatisTarihi.strftime('%d.%m.%Y %H:%M') }}</td>
+                        <td>
+                            {% if satis.musteri %}
+                            {{ satis.musteri.Ad }} {{ satis.musteri.Soyad }}
+                            {% else %}
+                            <span class="text-muted">Misafir</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ satis.ToplamTutar }} TL</td>
+                        <td>{{ satis.personel.Ad }} {{ satis.personel.Soyad }}</td>
+                        <td>
+                            <a href="{{ url_for('satis.detay', id=satis.SatisID) }}" class="btn btn-sm btn-info">Detay</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Sayfalama -->
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if satislar.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('satis.listele', page=satislar.prev_num) }}">Önceki</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Önceki</span>
+                </li>
+                {% endif %}
+                
+                {% for page_num in satislar.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                    {% if page_num %}
+                        {% if page_num == satislar.page %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('satis.listele', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if satislar.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('satis.listele', page=satislar.next_num) }}">Sonraki</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Sonraki</span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% else %}
+        <div class="alert alert-info">Henüz satış kaydı bulunmamaktadır.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,161 @@
+/* Ana stil tanımlamaları */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    flex: 1;
+}
+
+/* Navbar Stilleri */
+.navbar {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: #fff;
+}
+
+/* Kart Stilleri */
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 1.5rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Tablo Stilleri */
+.table th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Form Stilleri */
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.btn {
+    border-radius: 0.3rem;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+/* Sayfalama Stilleri */
+.pagination {
+    margin-bottom: 0;
+}
+
+.page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+/* Ana Sayfa Dashboard Stilleri */
+.display-4 {
+    font-weight: 600;
+}
+
+/* Sepet Stilleri */
+.cart-item {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+.cart-total {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+/* İstatistik Kutuları */
+.card .border-end {
+    border-right: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+/* Footer */
+footer {
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+    margin-top: auto;
+}
+
+/* Responsive İyileştirmeler */
+@media (max-width: 768px) {
+    .card .border-end {
+        border-right: none;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Animasyonlar */
+.btn, .card, .form-control {
+    transition: all 0.3s ease;
+}
+
+/* Yazdırma için */
+@media print {
+    .navbar, .btn, form, .pagination, footer {
+        display: none !important;
+    }
+    
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    .card-header {
+        border-bottom: 1px solid #000 !important;
+        background-color: #fff !important;
+    }
+    
+    body {
+        background-color: #fff !important;
+    }
+}

@@ -1,0 +1,106 @@
+KITABEVI OTOMASYON SISTEMI KURULUM KLAVUZU
+========================================
+
+Bu klavuz, Kitabevi Otomasyon Sistemi'ni kurmanız için gereken adımları içerir.
+Lütfen her adımı sırasıyla uygulayınız.
+
+1. SANAL ORTAM OLUŞTURMA
+------------------------
+Terminal'i açın ve aşağıdaki komutları çalıştırın:
+
+cd /Users/halitartun/Desktop/kitabevi-projesi
+python -m venv venv
+source venv/bin/activate  # macOS için
+# Windows için: venv\Scripts\activate
+
+
+2. GEREKLİ KÜTÜPHANELERİ YÜKLEME
+-------------------------------
+Sanal ortam aktifken şu komutu çalıştırın:
+
+pip install -r requirements.txt
+
+
+3. POSTGRESQL VERİTABANI KURULUMU
+--------------------------------
+A) PostgreSQL yüklü değilse:
+   - macOS: "brew install postgresql" 
+   - Windows: PostgreSQL'i postgresql.org adresinden indirip kurabilirsiniz
+   
+B) Veritabanını başlatın:
+   - macOS: "brew services start postgresql"
+   - Windows: Servisler üzerinden PostgreSQL servisini başlatın
+   
+C) Veritabanı oluşturun:
+   - "createdb kitabevi"
+
+
+4. .ENV DOSYASI OLUŞTURMA
+------------------------
+Proje ana dizininde .env adlı bir dosya oluşturun ve içine şunları yazın:
+
+DATABASE_URL=postgresql://localhost/kitabevi
+SECRET_KEY=gizli-bir-anahtar-yazin
+
+
+5. VERİTABANI ŞEMASINI OLUŞTURMA
+-------------------------------
+Aşağıdaki komutları sırayla çalıştırın:
+
+export FLASK_APP=run.py  # macOS/Linux için
+# Windows için: set FLASK_APP=run.py
+
+flask db init
+flask db migrate -m "initial migration"
+flask db upgrade
+
+
+6. İLK ADMİN KULLANICISINI OLUŞTURMA
+-----------------------------------
+A) Flask shell'i başlatın:
+   
+   flask shell
+
+B) Aşağıdaki Python kodunu girin:
+   
+   from app import db
+   from app.models import Personel
+   
+   admin = Personel(KullaniciAdi="admin", Ad="Admin", Soyad="User", Rol="Admin")
+   admin.set_password("password")
+   db.session.add(admin)
+   db.session.commit()
+   exit()
+
+
+7. UYGULAMAYI BAŞLATMA
+---------------------
+Aşağıdaki komutu çalıştırın:
+
+flask run
+
+Uygulama başladıktan sonra tarayıcınızda http://127.0.0.1:5000 adresine giderek
+sisteme erişebilirsiniz. Oluşturduğunuz admin kullanıcısı ile giriş yapın:
+
+Kullanıcı Adı: admin
+Şifre: password
+
+
+KURULUM SORUNLARI VE ÇÖZÜMLERİ
+==============================
+
+1. "ModuleNotFoundError: No module named 'flask'" hatası:
+   - pip install -r requirements.txt komutunu tekrar çalıştırın
+
+2. Veritabanı bağlantı hatası:
+   - PostgreSQL servisinin çalıştığından emin olun
+   - .env dosyasındaki bağlantı bilgilerini kontrol edin
+
+3. "Error: Could not locate a Flask application" hatası:
+   - export FLASK_APP=run.py komutunu çalıştırdığınızdan emin olun
+
+4. Migration hatası:
+   - flask db stamp head
+   - flask db migrate -m "reset"
+   - flask db upgrade
+   komutlarını sırayla çalıştırın

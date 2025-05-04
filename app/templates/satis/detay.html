@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">Satış Detayı #{{ satis.SatisID }}</h4>
+        <a href="{{ url_for('satis.listele') }}" class="btn btn-secondary btn-sm">Listeye Dön</a>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h5>Satış Bilgileri</h5>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Satış Numarası:</th>
+                        <td>{{ satis.SatisID }}</td>
+                    </tr>
+                    <tr>
+                        <th>Satış Tarihi:</th>
+                        <td>{{ satis.SatisTarihi.strftime('%d.%m.%Y %H:%M') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Toplam Tutar:</th>
+                        <td>{{ satis.ToplamTutar }} TL</td>
+                    </tr>
+                    <tr>
+                        <th>Personel:</th>
+                        <td>{{ satis.personel.Ad }} {{ satis.personel.Soyad }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h5>Müşteri Bilgileri</h5>
+                <table class="table table-bordered">
+                    {% if satis.musteri %}
+                    <tr>
+                        <th>Müşteri:</th>
+                        <td>{{ satis.musteri.Ad }} {{ satis.musteri.Soyad }}</td>
+                    </tr>
+                    <tr>
+                        <th>E-posta:</th>
+                        <td>{{ satis.musteri.Email or '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Telefon:</th>
+                        <td>{{ satis.musteri.Telefon or '-' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="2" class="text-center">Misafir Satışı</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+        
+        <h5>Satın Alınan Ürünler</h5>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Kitap</th>
+                        <th>Birim Fiyat</th>
+                        <th>Adet</th>
+                        <th>Toplam</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detay in satis.detaylar %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ detay.kitap.Ad }}</td>
+                        <td>{{ detay.BirimFiyat }} TL</td>
+                        <td>{{ detay.Adet }}</td>
+                        <td>{{ detay.BirimFiyat * detay.Adet }} TL</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="4" class="text-end">Genel Toplam:</th>
+                        <th>{{ satis.ToplamTutar }} TL</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        
+        <div class="d-flex justify-content-end mt-4">
+            <button class="btn btn-primary" onclick="window.print()">Yazdır</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
