@@ -36,7 +36,14 @@
                         <td>{{ satis.ToplamTutar }} TL</td>
                         <td>{{ satis.personel.Ad }} {{ satis.personel.Soyad }}</td>
                         <td>
-                            <a href="{{ url_for('satis.detay', id=satis.SatisID) }}" class="btn btn-sm btn-info">Detay</a>
+                            <div class="btn-group">
+                                <a href="{{ url_for('satis.detay', id=satis.SatisID) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i> Detay
+                                </a>
+                                <a href="{{ url_for('satis.detay_pdf', id=satis.SatisID) }}" class="btn btn-sm btn-danger" target="_blank">
+                                    <i class="fas fa-file-pdf"></i> PDF
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}

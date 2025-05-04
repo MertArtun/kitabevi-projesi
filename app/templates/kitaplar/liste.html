@@ -6,8 +6,40 @@
     <a href="{{ url_for('kitaplar.yeni_kitap') }}" class="btn btn-primary">Yeni Kitap Ekle</a>
 </div>
 
+<!-- Arama Formu -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" action="{{ url_for('kitaplar.index') }}" id="searchForm">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="Kitap adı, ISBN, yazar, kategori veya yayınevi..." value="{{ search_query }}" id="searchInput" autocomplete="off">
+                <button class="btn btn-primary" type="submit">
+                    <i class="fas fa-search"></i> Ara
+                </button>
+                {% if search_query %}
+                <a href="{{ url_for('kitaplar.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Temizle
+                </a>
+                {% endif %}
+            </div>
+        </form>
+        <div id="searchResults" class="dropdown-menu w-100 mt-1" style="display: none;"></div>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-body">
+        {% if kitaplar.total == 0 %}
+        <div class="text-center py-4">
+            <h4 class="text-muted">Kayıt bulunamadı</h4>
+            {% if search_query %}
+            <p>Arama kriterlerinize uygun sonuç bulunamadı.</p>
+            <a href="{{ url_for('kitaplar.index') }}" class="btn btn-primary">Tüm Kitapları Göster</a>
+            {% else %}
+            <p>Henüz kitap eklenmemiş.</p>
+            <a href="{{ url_for('kitaplar.yeni_kitap') }}" class="btn btn-primary">İlk Kitabı Ekle</a>
+            {% endif %}
+        </div>
+        {% else %}
         <div class="table-responsive">
             <table class="table table-striped table-hover">
                 <thead>
@@ -76,7 +108,7 @@
             <ul class="pagination justify-content-center">
                 {% if kitaplar.has_prev %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('kitaplar.index', page=kitaplar.prev_num) }}">Önceki</a>
+                    <a class="page-link" href="{{ url_for('kitaplar.index', page=kitaplar.prev_num, q=search_query) }}">Önceki</a>
                 </li>
                 {% else %}
                 <li class="page-item disabled">
@@ -92,7 +124,7 @@
                         </li>
                         {% else %}
                         <li class="page-item">
-                            <a class="page-link" href="{{ url_for('kitaplar.index', page=page_num) }}">{{ page_num }}</a>
+                            <a class="page-link" href="{{ url_for('kitaplar.index', page=page_num, q=search_query) }}">{{ page_num }}</a>
                         </li>
                         {% endif %}
                     {% else %}
@@ -104,7 +136,7 @@
                 
                 {% if kitaplar.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('kitaplar.index', page=kitaplar.next_num) }}">Sonraki</a>
+                    <a class="page-link" href="{{ url_for('kitaplar.index', page=kitaplar.next_num, q=search_query) }}">Sonraki</a>
                 </li>
                 {% else %}
                 <li class="page-item disabled">
@@ -113,6 +145,95 @@
                 {% endif %}
             </ul>
         </nav>
+        
+        <div class="text-center mt-3">
+            <p class="text-muted">Toplam {{ kitaplar.total }} kayıt bulundu. Sayfa {{ kitaplar.page }}/{{ kitaplar.pages }}</p>
+        </div>
+        {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+    
+    let searchTimeout;
+    
+    // Arama kutusunda yazı yazıldığında
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        
+        const query = this.value.trim();
+        if (query.length < 2) {
+            searchResults.style.display = 'none';
+            return;
+        }
+        
+        // API isteğini 300ms geciktirme (kullanıcı yazarken sürekli istek atmaması için)
+        searchTimeout = setTimeout(function() {
+            fetch(`/kitaplar/api/arama?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    searchResults.innerHTML = '';
+                    
+                    if (data.length === 0) {
+                        searchResults.style.display = 'none';
+                        return;
+                    }
+                    
+                    // Her sonuç için bir öğe oluştur
+                    data.forEach(item => {
+                        const resultItem = document.createElement('a');
+                        resultItem.classList.add('dropdown-item');
+                        resultItem.href = `/kitaplar/duzenle/${item.id}`;
+                        
+                        let stockBadge = `<span class="badge bg-success">Stok: ${item.stock}</span>`;
+                        if (item.stock <= 5) {
+                            stockBadge = `<span class="badge bg-danger">Stok: ${item.stock}</span>`;
+                        } else if (item.stock <= 10) {
+                            stockBadge = `<span class="badge bg-warning text-dark">Stok: ${item.stock}</span>`;
+                        }
+                        
+                        resultItem.innerHTML = `
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>${item.title}</strong><br>
+                                    <small>${item.authors}</small><br>
+                                    <small class="text-muted">${item.publisher} | ${item.category}</small>
+                                </div>
+                                <div class="text-end">
+                                    <div>${item.price} TL</div>
+                                    ${stockBadge}
+                                </div>
+                            </div>
+                        `;
+                        
+                        searchResults.appendChild(resultItem);
+                    });
+                    
+                    searchResults.style.display = 'block';
+                })
+                .catch(error => console.error('Arama hatası:', error));
+        }, 300);
+    });
+    
+    // Arama kutusu dışında bir yere tıklandığında sonuçları gizle
+    document.addEventListener('click', function(e) {
+        if (e.target !== searchInput && !searchResults.contains(e.target)) {
+            searchResults.style.display = 'none';
+        }
+    });
+    
+    // Arama kutusuna odaklandığında ve içinde yazı varsa sonuçları göster
+    searchInput.addEventListener('focus', function() {
+        if (this.value.trim().length >= 2) {
+            const event = new Event('input');
+            searchInput.dispatchEvent(event);
+        }
+    });
+});
+</script>
 {% endblock %}

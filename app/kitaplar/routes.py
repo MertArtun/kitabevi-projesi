@@ -1,18 +1,36 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
 from app import db
 from app.kitaplar import bp
 from app.kitaplar.forms import KitapForm, YazarForm, YayineviForm, KategoriForm
 from app.models import Kitap, Yazar, Yayinevi, Kategori
+from sqlalchemy import or_
 
 @bp.route('/')
 @login_required
 def index():
     page = request.args.get('page', 1, type=int)
-    kitaplar = Kitap.query.order_by(Kitap.Ad).paginate(
-        page=page, per_page=10, error_out=False)
+    search_query = request.args.get('q', '')
+    
+    if search_query:
+        # Arama sorgusu varsa, kitapları filtreleme
+        kitaplar = Kitap.query.join(Kitap.yazarlar).join(Kitap.yayinevi).join(Kitap.kategori).filter(
+            or_(
+                Kitap.Ad.ilike(f'%{search_query}%'),
+                Kitap.ISBN.ilike(f'%{search_query}%'),
+                Yazar.Ad.ilike(f'%{search_query}%'),
+                Yazar.Soyad.ilike(f'%{search_query}%'),
+                Yayinevi.Ad.ilike(f'%{search_query}%'),
+                Kategori.Ad.ilike(f'%{search_query}%')
+            )
+        ).distinct().order_by(Kitap.Ad).paginate(page=page, per_page=10, error_out=False)
+    else:
+        # Arama sorgusu yoksa, tüm kitaplar
+        kitaplar = Kitap.query.order_by(Kitap.Ad).paginate(
+            page=page, per_page=10, error_out=False)
+    
     return render_template('kitaplar/liste.html', title='Kitaplar', 
-                           kitaplar=kitaplar)
+                           kitaplar=kitaplar, search_query=search_query)
 
 @bp.route('/yeni', methods=['GET', 'POST'])
 @login_required
@@ -232,3 +250,38 @@ def sil_kategori(id):
         flash(f'Hata: Bu kategori bir veya daha fazla kitapla ilişkilendirilmiş olabilir. {str(e)}', 'danger')
     
     return redirect(url_for('kitaplar.kategoriler'))
+
+@bp.route('/api/arama')
+@login_required
+def api_arama():
+    search_query = request.args.get('q', '')
+    if not search_query or len(search_query) < 2:
+        return jsonify([])
+    
+    # Kitapları sorgula
+    kitaplar = Kitap.query.join(Kitap.yazarlar).join(Kitap.yayinevi).join(Kitap.kategori).filter(
+        or_(
+            Kitap.Ad.ilike(f'%{search_query}%'),
+            Kitap.ISBN.ilike(f'%{search_query}%'),
+            Yazar.Ad.ilike(f'%{search_query}%'),
+            Yazar.Soyad.ilike(f'%{search_query}%'),
+            Yayinevi.Ad.ilike(f'%{search_query}%'),
+            Kategori.Ad.ilike(f'%{search_query}%')
+        )
+    ).distinct().limit(10).all()
+    
+    results = []
+    for kitap in kitaplar:
+        yazarlar = [f"{yazar.Ad} {yazar.Soyad}" for yazar in kitap.yazarlar]
+        results.append({
+            'id': kitap.KitapID,
+            'title': kitap.Ad,
+            'isbn': kitap.ISBN,
+            'authors': ', '.join(yazarlar),
+            'publisher': kitap.yayinevi.Ad if kitap.yayinevi else '',
+            'category': kitap.kategori.Ad if kitap.kategori else '',
+            'price': str(kitap.Fiyat),
+            'stock': kitap.StokAdedi
+        })
+    
+    return jsonify(results)

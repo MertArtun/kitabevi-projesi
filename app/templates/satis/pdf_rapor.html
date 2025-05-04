@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satış Raporu - {{ satis.SatisID }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .header {
+            margin-bottom: 30px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        .info {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .info-box {
+            width: 48%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+        .totals {
+            margin-top: 20px;
+            text-align: right;
+        }
+        .total-row {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">Kitabevi Otomasyon Sistemi</div>
+        <div>Satış Raporu</div>
+    </div>
+    
+    <div class="info">
+        <div class="info-box">
+            <h3>Satış Bilgileri</h3>
+            <p><strong>Satış No:</strong> #{{ satis.SatisID }}</p>
+            <p><strong>Tarih:</strong> {{ satis.SatisTarihi.strftime('%d.%m.%Y %H:%M') }}</p>
+            <p><strong>İşlemi Yapan:</strong> {{ satis.kullanici.Ad }} {{ satis.kullanici.Soyad }}</p>
+        </div>
+        
+        <div class="info-box">
+            <h3>Müşteri Bilgileri</h3>
+            {% if satis.musteri %}
+            <p><strong>Ad Soyad:</strong> {{ satis.musteri.Ad }} {{ satis.musteri.Soyad }}</p>
+            <p><strong>E-posta:</strong> {{ satis.musteri.Email }}</p>
+            <p><strong>Telefon:</strong> {{ satis.musteri.Telefon }}</p>
+            {% else %}
+            <p>Misafir müşteri</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Kitap</th>
+                <th>Yazar</th>
+                <th>Birim Fiyat</th>
+                <th>Adet</th>
+                <th>Tutar</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detay in satis.detaylar %}
+            <tr>
+                <td>{{ detay.kitap.Ad }}</td>
+                <td>
+                    {% for yazar in detay.kitap.yazarlar %}
+                    {{ yazar.Ad }} {{ yazar.Soyad }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>{{ detay.BirimFiyat }} TL</td>
+                <td>{{ detay.Adet }}</td>
+                <td>{{ (detay.BirimFiyat * detay.Adet)|round(2) }} TL</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="totals">
+        <div class="total-row">Toplam Tutar: {{ satis.ToplamTutar }} TL</div>
+    </div>
+    
+    <div class="footer">
+        <p>Bu belge {{ tarih }} tarihinde otomatik olarak oluşturulmuştur.</p>
+        <p>Kitabevi Otomasyon Sistemi &copy; 2025. Tüm hakları saklıdır.</p>
+    </div>
+</body>
+</html>

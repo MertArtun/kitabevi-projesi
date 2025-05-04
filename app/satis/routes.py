@@ -1,9 +1,11 @@
-from flask import render_template, redirect, url_for, flash, request, session
+from flask import render_template, redirect, url_for, flash, request, session, make_response
 from flask_login import login_required, current_user
+from flask_weasyprint import HTML, render_pdf
 from app import db
 from app.satis import bp
 from app.satis.forms import MusteriSecForm, YeniMusteriForm, SepeteEkleForm, SatisTamamlaForm
 from app.models import Kitap, Musteri, Satis, SatisDetay
+from datetime import datetime
 
 @bp.route('/yeni', methods=['GET', 'POST'])
 @login_required
@@ -130,6 +132,28 @@ def tamamla():
 def detay(id):
     satis = Satis.query.get_or_404(id)
     return render_template('satis/detay.html', title='Satış Detayı', satis=satis)
+
+@bp.route('/detay/<int:id>/pdf')
+@login_required
+def detay_pdf(id):
+    satis = Satis.query.get_or_404(id)
+    
+    # PDF şablonunu oluştur
+    html = render_template('satis/pdf_rapor.html', 
+                          satis=satis,
+                          tarih=datetime.now().strftime('%d.%m.%Y %H:%M'))
+    
+    # PDF dosyasını oluştur
+    response = make_response(render_pdf(HTML(string=html)))
+    
+    # Dosya adı belirle
+    filename = f"satis_rapor_{satis.SatisID}_{datetime.now().strftime('%Y%m%d%H%M')}.pdf"
+    
+    # Tarayıcıya indirilecek dosya olarak belirt
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
 
 @bp.route('/listele')
 @login_required

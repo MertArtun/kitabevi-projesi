@@ -87,7 +87,10 @@
         </div>
         
         <div class="d-flex justify-content-end mt-4">
-            <button class="btn btn-primary" onclick="window.print()">Yazdır</button>
+            <div class="btn-group">
+                <button class="btn btn-outline-primary" onclick="window.print()"><i class="fas fa-print me-1"></i> Yazdır</button>
+                <a href="{{ url_for('satis.detay_pdf', id=satis.SatisID) }}" class="btn btn-primary" target="_blank"><i class="fas fa-file-pdf me-1"></i> PDF İndir</a>
+            </div>
         </div>
     </div>
 </div>

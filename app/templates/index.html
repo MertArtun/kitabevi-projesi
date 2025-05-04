@@ -35,6 +35,20 @@
     </div>
 </div>
 
+<!-- Aylık satış grafiği -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Aylık Satış Analizi</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="salesChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row mt-5">
     <div class="col-md-6 mb-4">
         <div class="card h-100 shadow-sm">
@@ -183,4 +197,47 @@
 
 {% block extra_js %}
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Aylık satış grafiği
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    const salesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ ay_isimleri|tojson }},
+            datasets: [{
+                label: 'Aylık Satış Sayısı',
+                data: {{ aylik_satis_sayilari }},
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Son 6 Aylık Satış Verileri'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.parsed.y + ' satış';
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
 {% endblock %}
