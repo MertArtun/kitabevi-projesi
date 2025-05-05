@@ -42,49 +42,70 @@
         </div>
     </div>
 
-    <!-- Grafik ve Hızlı Erişim -->
+    <!-- Grafik Alanı -->
     <div class="row mb-4">
-        <!-- Satış Grafiği -->
-        <div class="col-lg-8 mb-4">
+        <!-- Aylık Satış Grafiği (Bar) -->
+        <div class="col-lg-7 mb-4">
             <div class="card h-100">
                 <div class="card-header d-flex align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Aylık Satış Analizi</h5>
-                    <div class="ms-auto">
-                        <select class="form-select form-select-sm" id="chartPeriod">
-                            <option value="6" selected>Son 6 Ay</option>
-                            <option value="12">Son 12 Ay</option>
-                            <option value="3">Son 3 Ay</option>
-                        </select>
-                    </div>
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Aylık Satış Analizi (Son 6 Ay)</h5>
                 </div>
                 <div class="card-body">
-                    <div class="chart-container">
+                    <div class="chart-container" style="height: 300px;">
                         <canvas id="salesChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Hızlı Erişim -->
-        <div class="col-lg-4 mb-4">
-            <div class="card h-100">
+        
+        <!-- Kategori Satış Grafiği (Pasta) -->
+        <div class="col-lg-5 mb-4">
+             <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Kategori Satış Dağılımı (Son 6 Ay)</h5>
+                </div>
+                <div class="card-body d-flex align-items-center justify-content-center">
+                    {% if kategori_isimleri %}
+                    <div class="chart-container" style="height: 300px; width: 100%;">
+                        <canvas id="categorySalesChart"></canvas>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center my-auto">Son 6 ayda kategori bazlı satış verisi bulunamadı.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hızlı Erişim (Yeni Satır) -->
+    <div class="row mb-4">
+        <div class="col-12">
+             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Hızlı Erişim</h5>
                 </div>
                 <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a href="{{ url_for('satis.yeni') }}" class="btn btn-primary btn-lg mb-3">
-                            <i class="fas fa-cart-plus me-2"></i>Yeni Satış
-                        </a>
-                        <a href="{{ url_for('kitaplar.yeni_kitap') }}" class="btn btn-success btn-lg mb-3">
-                            <i class="fas fa-book-medical me-2"></i>Kitap Ekle
-                        </a>
-                        <a href="{{ url_for('kitaplar.yazarlar') }}" class="btn btn-info btn-lg mb-3">
-                            <i class="fas fa-user-edit me-2"></i>Yazarları Yönet
-                        </a>
-                        <a href="{{ url_for('satis.listele') }}" class="btn btn-warning btn-lg">
-                            <i class="fas fa-list me-2"></i>Satışları Görüntüle
-                        </a>
+                    <div class="row text-center">
+                        <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+                             <a href="{{ url_for('satis.yeni') }}" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-cart-plus me-2"></i>Yeni Satış
+                            </a>
+                        </div>
+                         <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+                             <a href="{{ url_for('kitaplar.yeni_kitap') }}" class="btn btn-success btn-lg w-100">
+                                <i class="fas fa-book-medical me-2"></i>Kitap Ekle
+                            </a>
+                        </div>
+                         <div class="col-lg-3 col-md-6 mb-3 mb-md-0">
+                             <a href="{{ url_for('kitaplar.yazarlar') }}" class="btn btn-info btn-lg w-100">
+                                <i class="fas fa-user-edit me-2"></i>Yazarları Yönet
+                            </a>
+                        </div>
+                         <div class="col-lg-3 col-md-6">
+                             <a href="{{ url_for('satis.listele') }}" class="btn btn-warning btn-lg w-100">
+                                <i class="fas fa-list me-2"></i>Satışları Görüntüle
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -159,9 +180,102 @@
     </div>
     {% endif %}
 
+    <!-- Son Eklenen Kitaplar ve En Çok Satan Kitaplar -->
+    <div class="row mb-4">
+        {% if latest_books %}
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-book-medical me-2"></i>Son Eklenen Kitaplar</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Kitap Adı</th>
+                                    <th>Yazar</th>
+                                    <th class="text-end">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for kitap in latest_books %}
+                                <tr>
+                                    <td>{{ kitap.Ad }}</td>
+                                    <td>
+                                        {% for yazar in kitap.yazarlar %}
+                                        {{ yazar.Ad }} {{ yazar.Soyad }}{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{{ url_for('kitaplar.duzenle_kitap', id=kitap.KitapID) }}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i> Görüntüle
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer text-end">
+                    <a href="{{ url_for('kitaplar.index') }}" class="btn btn-sm btn-primary">Tüm Kitapları Görüntüle</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if top_selling_books %}
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>En Çok Satan Kitaplar (Son 6 Ay)</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Kitap Adı</th>
+                                    <th>Yazar</th>
+                                    <th class="text-center">Satış Miktarı</th>
+                                    <th class="text-end">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for kitap, total_sold in top_selling_books %}
+                                <tr>
+                                    <td>{{ kitap.Ad }}</td>
+                                    <td>
+                                        {% for yazar in kitap.yazarlar %}
+                                        {{ yazar.Ad }} {{ yazar.Soyad }}{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success">{{ total_sold }} adet</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{{ url_for('kitaplar.duzenle_kitap', id=kitap.KitapID) }}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i> Görüntüle
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer text-end">
+                     <a href="{{ url_for('satis.listele') }}" class="btn btn-sm btn-primary">Tüm Satışları Görüntüle</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
     <!-- Kritik Stok Uyarıları -->
     {% if low_stock_books %}
-    <div class="row">
+    <div class="row mb-4"> {# mb-4 eklendi #}
         <div class="col-12">
             <div class="card border-danger">
                 <div class="card-header bg-danger text-white d-flex align-items-center">
@@ -266,28 +380,18 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             plugins: {
                 title: {
-                    display: true,
-                    text: 'Son 6 Aylık Satış Verileri',
-                    font: {
-                        size: 16,
-                        weight: 'bold'
-                    },
-                    padding: {
-                        bottom: 20
-                    }
+                    display: false, // Başlık kart header'ında
+                    // text: 'Son 6 Aylık Satış Verileri', 
+                    // font: { size: 16, weight: 'bold' },
+                    // padding: { bottom: 20 }
                 },
                 legend: {
                     display: false
                 },
                 tooltip: {
                     backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                    titleFont: {
-                        size: 14,
-                        weight: 'bold'
-                    },
-                    bodyFont: {
-                        size: 14
-                    },
+                    titleFont: { size: 14, weight: 'bold' },
+                    bodyFont: { size: 14 },
                     padding: 12,
                     callbacks: {
                         label: function(context) {
@@ -299,11 +403,88 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Grafik period değiştirme dinleyicisi (gerçek projelerde backend'e istek atılarak veri güncellenebilir)
-    document.getElementById('chartPeriod').addEventListener('change', function() {
-        // Gerçek projelerde burada backend'e istek atılarak veriler güncellenir
-        alert('Gerçek bir projede burada backend\'e istek atarak grafiği güncelleyebilirsiniz.');
-    });
+    // Kategori Satış Pasta Grafiği
+    const categoryCtx = document.getElementById('categorySalesChart');
+    if (categoryCtx) { // Canvas varsa grafiği oluştur
+        const categoryLabels = {{ kategori_isimleri|tojson }};
+        const categoryData = {{ kategori_satis_adetleri|tojson }};
+        
+        // Rastgele renkler üretme fonksiyonu
+        function generateRandomColors(numColors) {
+            const colors = [];
+            // Önceden tanımlanmış hoş renk paleti (Chart.js varsayılanlarından daha iyi olabilir)
+            const palette = [
+                'rgba(54, 162, 235, 0.8)', 'rgba(255, 99, 132, 0.8)', 'rgba(255, 206, 86, 0.8)', 
+                'rgba(75, 192, 192, 0.8)', 'rgba(153, 102, 255, 0.8)', 'rgba(255, 159, 64, 0.8)',
+                'rgba(199, 199, 199, 0.8)', 'rgba(83, 102, 255, 0.8)', 'rgba(100, 255, 100, 0.8)'
+            ];
+            for (let i = 0; i < numColors; i++) {
+                colors.push(palette[i % palette.length]); // Paleti tekrarla
+            }
+            return colors;
+        }
+        
+        const categoryColors = generateRandomColors(categoryLabels.length);
+
+        const categorySalesChart = new Chart(categoryCtx.getContext('2d'), {
+            type: 'pie', // Grafik tipi: pasta
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    label: 'Satış Adedi',
+                    data: categoryData,
+                    backgroundColor: categoryColors,
+                    borderColor: categoryColors.map(color => color.replace('0.8', '1')), // Kenarlık için daha opak renk
+                    borderWidth: 1,
+                    hoverOffset: 8 // Üzerine gelince dilimin dışarı çıkma mesafesi
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom', // Etiketleri alta al
+                         labels: {
+                            padding: 15, // Etiketler arası boşluk
+                            font: {
+                                size: 13 
+                            }
+                        }
+                    },
+                    title: {
+                        display: false // Başlık zaten kart header'ında var
+                    },
+                     tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed + ' adet';
+                                }
+                                // Yüzdelik dilimi de ekleyelim
+                                const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                if (total > 0) { // Sıfıra bölme hatasını engelle
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1) + '%';
+                                    label += ` (${percentage})`;
+                                }
+                                
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } // if (categoryCtx) sonu
+
+    // Grafik period değiştirme dinleyicisi kaldırıldı
+    // document.getElementById('chartPeriod').addEventListener('change', function() {
+    //     alert('Gerçek bir projede burada backend\'e istek atarak grafiği güncelleyebilirsiniz.');
+    // });
 });
 
 // Kart ve tablolara animasyon ekle

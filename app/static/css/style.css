@@ -1,17 +1,17 @@
 /* Tema Değişkenleri */
 :root {
     /* Açık Tema (Varsayılan) */
-    --primary-color: #3498db;
-    --secondary-color: #2c3e50;
-    --accent-color: #e74c3c;
-    --light-color: #f8f9fa;
-    --dark-color: #343a40;
-    --success-color: #2ecc71;
+    --primary-color: #5a8dee;
+    --secondary-color: #62688f;
+    --accent-color: #ff6b6b;
+    --light-color: #f4f7f6;
+    --dark-color: #2c3e50;
+    --success-color: #4cdb7f;
     --warning-color: #f39c12;
     --danger-color: #e74c3c;
     
     /* Arka plan ve metin renkleri */
-    --bg-color: #f8f9fa;
+    --bg-color: #f4f7f6;
     --bg-card: #ffffff;
     --text-color: #333333;
     --text-muted: #6c757d;
@@ -25,13 +25,13 @@
 
 /* Koyu Tema */
 [data-theme="dark"] {
-    --primary-color: #4dabf5;
-    --secondary-color: #384e63;
-    --accent-color: #ff6b6b;
-    --light-color: #2d3436;
-    --dark-color: #1e272e;
-    --success-color: #26de81;
-    --warning-color: #f39c12;
+    --primary-color: #7daff7;
+    --secondary-color: #7f85a3;
+    --accent-color: #ff8e8e;
+    --light-color: #343a40;
+    --dark-color: #1a202c;
+    --success-color: #65e9a1;
+    --warning-color: #f5b041;
     --danger-color: #ff6b6b;
     
     /* Arka plan ve metin renkleri */
@@ -44,7 +44,7 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins', sans-serif;
     background-color: var(--bg-color);
     min-height: 100vh;
     display: flex;
@@ -117,6 +117,7 @@ body {
     overflow: hidden;
     transition: var(--transition);
     background-color: var(--bg-card);
+    border: 1px solid var(--border-color); /* Kenarlık ekle */
 }
 
 .card-header {
@@ -128,11 +129,13 @@ body {
     align-items: center;
     justify-content: space-between;
     color: var(--text-color);
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
 }
 
 .card:hover {
-    box-shadow: 0 0.8rem 2rem rgba(0, 0, 0, 0.15);
-    transform: translateY(-5px);
+    box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.2); /* Daha belirgin gölge */
+    transform: translateY(-7px); /* Daha belirgin hover efekti */
 }
 
 .card-body {
@@ -142,22 +145,24 @@ body {
 /* Dashboard kartları */
 .dashboard-stat-card {
     text-align: center;
-    padding: 1.5rem;
+    padding: 2rem; /* Padding artırıldı */
     border-radius: var(--border-radius);
     transition: var(--transition);
     position: relative;
     overflow: hidden;
+    box-shadow: var(--box-shadow); /* Gölge eklendi */
+    color: white; /* Metin rengi beyaz yapıldı */
 }
 
 .dashboard-stat-card h3 {
-    font-size: 2.2rem;
+    font-size: 2.5rem; /* Yazı tipi boyutu artırıldı */
     font-weight: 700;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.5rem; /* Alt boşluk artırıldı */
 }
 
 .dashboard-stat-card p {
-    font-size: 1rem;
-    opacity: 0.8;
+    font-size: 1.1rem; /* Yazı tipi boyutu artırıldı */
+    opacity: 0.9; /* Opaklık artırıldı */
     margin-bottom: 0;
 }
 
@@ -165,28 +170,29 @@ body {
     position: absolute;
     right: 1.5rem;
     top: 1.5rem;
-    font-size: 2rem;
-    opacity: 0.2;
+    font-size: 2.5rem; /* İkon boyutu artırıldı */
+    opacity: 0.3; /* Opaklık artırıldı */
 }
 
 .dashboard-stat-card.primary {
-    background: linear-gradient(135deg, var(--primary-color), #5dade2);
-    color: white;
+    background: linear-gradient(135deg, var(--primary-color), #2980b9); /* Renk geçişi güncellendi */
 }
 
 .dashboard-stat-card.success {
-    background: linear-gradient(135deg, var(--success-color), #58d68d);
-    color: white;
+    background: linear-gradient(135deg, var(--success-color), #27ae60); /* Renk geçişi güncellendi */
 }
 
 .dashboard-stat-card.warning {
-    background: linear-gradient(135deg, var(--warning-color), #f5b041);
-    color: white;
+    background: linear-gradient(135deg, var(--warning-color), #f39c12); /* Renk geçişi güncellendi */
 }
 
 .dashboard-stat-card.danger {
-    background: linear-gradient(135deg, var(--danger-color), #ec7063);
-    color: white;
+    background: linear-gradient(135deg, var(--danger-color), #c0392b); /* Renk geçişi güncellendi */
+}
+
+.dashboard-stat-card:hover {
+    transform: translateY(-5px); /* Hover efekti */
+    box-shadow: 0 0.8rem 2rem rgba(0, 0, 0, 0.15); /* Hover gölgesi */
 }
 
 /* Tablo Stilleri */
@@ -250,45 +256,63 @@ body {
 /* Buton Stilleri */
 .btn {
     border-radius: var(--border-radius);
-    font-weight: 500;
-    padding: 0.6rem 1.2rem;
+    font-weight: 600; /* Yazı tipi kalınlığı artırıldı */
+    padding: 0.8rem 1.5rem; /* Padding artırıldı */
     transition: var(--transition);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-size: 0.9rem;
+    letter-spacing: 0.8px; /* Harf aralığı artırıldı */
+    font-size: 1rem; /* Yazı tipi boyutu artırıldı */
+    border: none; /* Kenarlık kaldırıldı */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Hafif gölge eklendi */
+}
+
+.btn:hover {
+    transform: translateY(-3px); /* Hafif yukarı hareket */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Hover'da daha belirgin gölge */
 }
 
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-color), #2980b9);
-    border: none;
 }
 
 .btn-primary:hover {
     background: linear-gradient(135deg, #2980b9, #1a5276);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
 }
 
 .btn-success {
     background: linear-gradient(135deg, var(--success-color), #27ae60);
-    border: none;
 }
 
 .btn-success:hover {
     background: linear-gradient(135deg, #27ae60, #1e8449);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
 }
 
 .btn-danger {
     background: linear-gradient(135deg, var(--danger-color), #c0392b);
-    border: none;
 }
 
 .btn-danger:hover {
     background: linear-gradient(135deg, #c0392b, #922b21);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+}
+
+.btn-info { /* Yeni btn-info stili */
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+}
+
+.btn-info:hover {
+    background: linear-gradient(135deg, #2980b9, #1a5276);
+    color: white;
+}
+
+.btn-warning { /* Yeni btn-warning stili */
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #e67e22, #d35400);
+    color: white;
 }
 
 /* Sayfalama Stilleri */

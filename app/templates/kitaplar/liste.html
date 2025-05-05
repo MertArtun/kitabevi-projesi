@@ -10,16 +10,36 @@
 <div class="card mb-4">
     <div class="card-body">
         <form method="get" action="{{ url_for('kitaplar.index') }}" id="searchForm">
-            <div class="input-group">
-                <input type="text" name="q" class="form-control" placeholder="Kitap adı, ISBN, yazar, kategori veya yayınevi..." value="{{ search_query }}" id="searchInput" autocomplete="off">
-                <button class="btn btn-primary" type="submit">
-                    <i class="fas fa-search"></i> Ara
-                </button>
-                {% if search_query %}
-                <a href="{{ url_for('kitaplar.index') }}" class="btn btn-secondary">
-                    <i class="fas fa-times"></i> Temizle
-                </a>
-                {% endif %}
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <input type="text" name="q" class="form-control" placeholder="Kitap adı, ISBN, yazar..." value="{{ search_query }}" id="searchInput" autocomplete="off">
+                </div>
+                <div class="col-md-2">
+                    <select name="kategori_id" class="form-select" onchange="this.form.submit()">
+                        <option value="">Tüm Kategoriler</option>
+                        {% for kategori in kategoriler %}
+                        <option value="{{ kategori.KategoriID }}" {% if kategori.KategoriID == selected_kategori %}selected{% endif %}>{{ kategori.Ad }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="yayinevi_id" class="form-select" onchange="this.form.submit()">
+                        <option value="">Tüm Yayınevleri</option>
+                        {% for yayinevi in yayinevleri %}
+                        <option value="{{ yayinevi.YayineviID }}" {% if yayinevi.YayineviID == selected_yayinevi %}selected{% endif %}>{{ yayinevi.Ad }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex">
+                    <button class="btn btn-primary w-100 me-1" type="submit">
+                        <i class="fas fa-filter"></i> Filtrele/Ara
+                    </button>
+                    {% if search_query or selected_kategori or selected_yayinevi %}
+                    <a href="{{ url_for('kitaplar.index') }}" class="btn btn-secondary" title="Filtreleri Temizle">
+                        <i class="fas fa-times"></i>
+                    </a>
+                    {% endif %}
+                </div>
             </div>
         </form>
         <div id="searchResults" class="dropdown-menu w-100 mt-1" style="display: none;"></div>
@@ -205,9 +225,10 @@
         <!-- Sayfalama -->
         <nav>
             <ul class="pagination justify-content-center mt-4">
+                {% set url_params = {'q': search_query, 'kategori_id': selected_kategori, 'yayinevi_id': selected_yayinevi} %}
                 {% if kitaplar.has_prev %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('kitaplar.index', page=kitaplar.prev_num, q=search_query) }}">Önceki</a>
+                    <a class="page-link" href="{{ url_for('kitaplar.index', page=kitaplar.prev_num, **url_params) }}">Önceki</a>
                 </li>
                 {% else %}
                 <li class="page-item disabled">
@@ -223,7 +244,7 @@
                         </li>
                         {% else %}
                         <li class="page-item">
-                            <a class="page-link" href="{{ url_for('kitaplar.index', page=page_num, q=search_query) }}">{{ page_num }}</a>
+                            <a class="page-link" href="{{ url_for('kitaplar.index', page=page_num, **url_params) }}">{{ page_num }}</a>
                         </li>
                         {% endif %}
                     {% else %}
@@ -235,7 +256,7 @@
                 
                 {% if kitaplar.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('kitaplar.index', page=kitaplar.next_num, q=search_query) }}">Sonraki</a>
+                    <a class="page-link" href="{{ url_for('kitaplar.index', page=kitaplar.next_num, **url_params) }}">Sonraki</a>
                 </li>
                 {% else %}
                 <li class="page-item disabled">

@@ -84,10 +84,15 @@ def setup_default_images():
 def index():
     page = request.args.get('page', 1, type=int)
     search_query = request.args.get('q', '')
+    kategori_id = request.args.get('kategori_id', type=int)
+    yayinevi_id = request.args.get('yayinevi_id', type=int)
     
+    # Temel sorgu
+    query = Kitap.query.order_by(Kitap.Ad)
+    
+    # Arama filtresi
     if search_query:
-        # Arama sorgusu varsa, kitapları filtreleme
-        kitaplar = Kitap.query.join(Kitap.yazarlar).join(Kitap.yayinevi).join(Kitap.kategori).filter(
+        query = query.join(Kitap.yazarlar).join(Kitap.yayinevi).join(Kitap.kategori).filter(
             or_(
                 Kitap.Ad.ilike(f'%{search_query}%'),
                 Kitap.ISBN.ilike(f'%{search_query}%'),
@@ -96,14 +101,30 @@ def index():
                 Yayinevi.Ad.ilike(f'%{search_query}%'),
                 Kategori.Ad.ilike(f'%{search_query}%')
             )
-        ).distinct().order_by(Kitap.Ad).paginate(page=page, per_page=10, error_out=False)
-    else:
-        # Arama sorgusu yoksa, tüm kitaplar
-        kitaplar = Kitap.query.order_by(Kitap.Ad).paginate(
-            page=page, per_page=10, error_out=False)
+        ).distinct() # distinct() arama için önemli
+        
+    # Kategori filtresi
+    if kategori_id:
+        query = query.filter(Kitap.KategoriID == kategori_id)
+        
+    # Yayınevi filtresi
+    if yayinevi_id:
+        query = query.filter(Kitap.YayineviID == yayinevi_id)
+        
+    # Sayfalama
+    kitaplar = query.paginate(page=page, per_page=10, error_out=False)
     
-    return render_template('kitaplar/liste.html', title='Kitaplar', 
-                           kitaplar=kitaplar, search_query=search_query)
+    # Filtreleme için kategorileri ve yayınevlerini al
+    kategoriler = Kategori.query.order_by(Kategori.Ad).all()
+    yayinevleri = Yayinevi.query.order_by(Yayinevi.Ad).all()
+    
+    return render_template('kitaplar/liste.html', title='Kitaplar',
+                           kitaplar=kitaplar,
+                           search_query=search_query,
+                           kategoriler=kategoriler,
+                           yayinevleri=yayinevleri,
+                           selected_kategori=kategori_id,
+                           selected_yayinevi=yayinevi_id)
 
 @bp.route('/yeni', methods=['GET', 'POST'])
 @login_required
