@@ -40,44 +40,143 @@
             {% endif %}
         </div>
         {% else %}
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>ISBN</th>
-                        <th>Kitap Adı</th>
-                        <th>Yazar(lar)</th>
-                        <th>Yayınevi</th>
-                        <th>Kategori</th>
-                        <th>Fiyat</th>
-                        <th>Stok</th>
-                        <th>İşlemler</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for kitap in kitaplar.items %}
-                    <tr>
-                        <td>{{ kitap.KitapID }}</td>
-                        <td>{{ kitap.ISBN }}</td>
-                        <td>{{ kitap.Ad }}</td>
-                        <td>
-                            {% for yazar in kitap.yazarlar %}
-                            {{ yazar.Ad }} {{ yazar.Soyad }}{% if not loop.last %}, {% endif %}
-                            {% endfor %}
-                        </td>
-                        <td>{{ kitap.yayinevi.Ad }}</td>
-                        <td>{{ kitap.kategori.Ad }}</td>
-                        <td>{{ kitap.Fiyat }} TL</td>
-                        <td>{{ kitap.StokAdedi }}</td>
-                        <td>
-                            <div class="btn-group">
-                                <a href="{{ url_for('kitaplar.duzenle_kitap', id=kitap.KitapID) }}" class="btn btn-sm btn-warning">Düzenle</a>
-                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#silModal{{ kitap.KitapID }}">Sil</button>
+        
+        <!-- Görünüm seçenekleri -->
+        <div class="mb-3">
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-primary active" id="tableViewBtn" onclick="switchView('table')">
+                    <i class="fas fa-table"></i> Tablo Görünümü
+                </button>
+                <button type="button" class="btn btn-outline-primary" id="cardViewBtn" onclick="switchView('card')">
+                    <i class="fas fa-th-large"></i> Kart Görünümü
+                </button>
+            </div>
+        </div>
+        
+        <!-- Tablo görünümü -->
+        <div id="tableView" class="animated fadeIn">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Kapak</th>
+                            <th>ISBN</th>
+                            <th>Kitap Adı</th>
+                            <th>Yazar(lar)</th>
+                            <th>Yayınevi</th>
+                            <th>Kategori</th>
+                            <th>Fiyat</th>
+                            <th>Stok</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for kitap in kitaplar.items %}
+                        <tr>
+                            <td class="text-center">
+                                {% if kitap.KapakResmi and kitap.KapakResmi != 'default_book_cover.jpg' %}
+                                    <img src="{{ url_for('static', filename='img/kitap_kapaklari/' + kitap.KapakResmi) }}" 
+                                        alt="{{ kitap.Ad }}" class="img-thumbnail" style="height: 60px;">
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='img/kitap_kapaklari/default_book_cover.jpg') }}" 
+                                        alt="Varsayılan Kapak" class="img-thumbnail" style="height: 60px;">
+                                {% endif %}
+                            </td>
+                            <td>{{ kitap.ISBN }}</td>
+                            <td>{{ kitap.Ad }}</td>
+                            <td>
+                                {% for yazar in kitap.yazarlar %}
+                                {{ yazar.Ad }} {{ yazar.Soyad }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>{{ kitap.yayinevi.Ad }}</td>
+                            <td>{{ kitap.kategori.Ad }}</td>
+                            <td>{{ kitap.Fiyat }} TL</td>
+                            <td>
+                                {% if kitap.StokAdedi <= 5 %}
+                                <span class="badge bg-danger">{{ kitap.StokAdedi }}</span>
+                                {% elif kitap.StokAdedi <= 10 %}
+                                <span class="badge bg-warning text-dark">{{ kitap.StokAdedi }}</span>
+                                {% else %}
+                                <span class="badge bg-success">{{ kitap.StokAdedi }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('kitaplar.duzenle_kitap', id=kitap.KitapID) }}" class="btn btn-sm btn-warning">Düzenle</a>
+                                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#silModal{{ kitap.KitapID }}">Sil</button>
+                                </div>
+                                
+                                <!-- Silme Onay Modalı -->
+                                <div class="modal fade" id="silModal{{ kitap.KitapID }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Silme Onayı</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>"{{ kitap.Ad }}" kitabını silmek istediğinize emin misiniz?</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                                                <form action="{{ url_for('kitaplar.sil_kitap', id=kitap.KitapID) }}" method="post">
+                                                    <button type="submit" class="btn btn-danger">Sil</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Kart görünümü -->
+        <div id="cardView" class="animated fadeIn" style="display: none;">
+            <div class="row">
+                {% for kitap in kitaplar.items %}
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="card h-100 book-card">
+                        <div class="book-cover-container text-center pt-3">
+                            {% if kitap.KapakResmi and kitap.KapakResmi != 'default_book_cover.jpg' %}
+                                <img src="{{ url_for('static', filename='img/kitap_kapaklari/' + kitap.KapakResmi) }}" 
+                                    alt="{{ kitap.Ad }}" class="book-cover">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='img/kitap_kapaklari/default_book_cover.jpg') }}" 
+                                    alt="Varsayılan Kapak" class="book-cover">
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title mb-1">{{ kitap.Ad }}</h5>
+                            <p class="card-text text-muted mb-0">
+                                {% for yazar in kitap.yazarlar %}
+                                {{ yazar.Ad }} {{ yazar.Soyad }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                            <p class="card-text small">{{ kitap.yayinevi.Ad }} | {{ kitap.kategori.Ad }}</p>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <span class="fs-5 fw-bold">{{ kitap.Fiyat }} TL</span>
+                                {% if kitap.StokAdedi <= 5 %}
+                                <span class="badge bg-danger">Stok: {{ kitap.StokAdedi }}</span>
+                                {% elif kitap.StokAdedi <= 10 %}
+                                <span class="badge bg-warning text-dark">Stok: {{ kitap.StokAdedi }}</span>
+                                {% else %}
+                                <span class="badge bg-success">Stok: {{ kitap.StokAdedi }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="btn-group w-100">
+                                <a href="{{ url_for('kitaplar.duzenle_kitap', id=kitap.KitapID) }}" class="btn btn-sm btn-warning flex-grow-1">Düzenle</a>
+                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#silModalCard{{ kitap.KitapID }}">Sil</button>
                             </div>
                             
-                            <!-- Silme Onay Modalı -->
-                            <div class="modal fade" id="silModal{{ kitap.KitapID }}" tabindex="-1">
+                            <!-- Kart Görünümü için Silme Onay Modalı -->
+                            <div class="modal fade" id="silModalCard{{ kitap.KitapID }}" tabindex="-1">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header">
@@ -96,16 +195,16 @@
                                     </div>
                                 </div>
                             </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
         
         <!-- Sayfalama -->
         <nav>
-            <ul class="pagination justify-content-center">
+            <ul class="pagination justify-content-center mt-4">
                 {% if kitaplar.has_prev %}
                 <li class="page-item">
                     <a class="page-link" href="{{ url_for('kitaplar.index', page=kitaplar.prev_num, q=search_query) }}">Önceki</a>
@@ -159,6 +258,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const searchResults = document.getElementById('searchResults');
+    
+    // Tercih edilen görünüm tipini localStorage'dan oku
+    const preferredView = localStorage.getItem('kitapListe_viewType') || 'table';
+    switchView(preferredView);
     
     let searchTimeout;
     
@@ -235,5 +338,74 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Görünüm değiştirme fonksiyonu
+function switchView(viewType) {
+    const tableView = document.getElementById('tableView');
+    const cardView = document.getElementById('cardView');
+    const tableViewBtn = document.getElementById('tableViewBtn');
+    const cardViewBtn = document.getElementById('cardViewBtn');
+    
+    // Kullanıcı tercihini kaydet
+    localStorage.setItem('kitapListe_viewType', viewType);
+    
+    if (viewType === 'table') {
+        tableView.style.display = 'block';
+        cardView.style.display = 'none';
+        tableViewBtn.classList.add('active');
+        cardViewBtn.classList.remove('active');
+    } else {
+        tableView.style.display = 'none';
+        cardView.style.display = 'block';
+        tableViewBtn.classList.remove('active');
+        cardViewBtn.classList.add('active');
+    }
+}
 </script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.book-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.book-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.book-cover-container {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.book-cover {
+    max-height: 180px;
+    max-width: 90%;
+    object-fit: contain;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+}
+
+.book-card:hover .book-cover {
+    transform: scale(1.05);
+}
+
+.animated {
+    animation-duration: 0.5s;
+}
+
+.fadeIn {
+    animation-name: fadeIn;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+</style>
 {% endblock %}

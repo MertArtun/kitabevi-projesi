@@ -1,198 +1,223 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12 text-center mb-4">
-        <h1 class="display-4">Kitabevi Otomasyon Sistemi</h1>
-        <p class="lead">Hoş geldiniz, {{ current_user.Ad }}!</p>
+<div class="dashboard fade-in">
+    <!-- Dashboard Başlık -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4 fw-bold mb-2">Kitabevi Yönetim Paneli</h1>
+            <p class="lead text-muted">Merhaba <span class="text-primary fw-bold">{{ current_user.Ad }}</span>, bugün neler yapmak istersiniz?</p>
+        </div>
     </div>
-</div>
 
-<div class="row mb-4">
-    <div class="col-md-12">
-        <div class="card bg-light">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3 text-center border-end">
-                        <h3 class="text-primary mb-0">{{ kitap_sayisi }}</h3>
-                        <p class="text-muted">Toplam Kitap</p>
-                    </div>
-                    <div class="col-md-3 text-center border-end">
-                        <h3 class="text-success mb-0">{{ yazar_sayisi }}</h3>
-                        <p class="text-muted">Toplam Yazar</p>
-                    </div>
-                    <div class="col-md-3 text-center border-end">
-                        <h3 class="text-info mb-0">{{ musteri_sayisi }}</h3>
-                        <p class="text-muted">Toplam Müşteri</p>
-                    </div>
-                    <div class="col-md-3 text-center">
-                        <h3 class="text-warning mb-0">{{ satis_sayisi }}</h3>
-                        <p class="text-muted">Toplam Satış</p>
-                    </div>
-                </div>
+    <!-- İstatistik Kartları -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="dashboard-stat-card primary">
+                <i class="fas fa-book"></i>
+                <h3>{{ kitap_sayisi }}</h3>
+                <p>Toplam Kitap</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="dashboard-stat-card success">
+                <i class="fas fa-pen-nib"></i>
+                <h3>{{ yazar_sayisi }}</h3>
+                <p>Toplam Yazar</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="dashboard-stat-card warning">
+                <i class="fas fa-user"></i>
+                <h3>{{ musteri_sayisi }}</h3>
+                <p>Toplam Müşteri</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="dashboard-stat-card danger">
+                <i class="fas fa-shopping-cart"></i>
+                <h3>{{ satis_sayisi }}</h3>
+                <p>Toplam Satış</p>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Aylık satış grafiği -->
-<div class="row mt-4">
-    <div class="col-md-12">
-        <div class="card shadow-sm">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Aylık Satış Analizi</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="salesChart" width="400" height="200"></canvas>
+    <!-- Grafik ve Hızlı Erişim -->
+    <div class="row mb-4">
+        <!-- Satış Grafiği -->
+        <div class="col-lg-8 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Aylık Satış Analizi</h5>
+                    <div class="ms-auto">
+                        <select class="form-select form-select-sm" id="chartPeriod">
+                            <option value="6" selected>Son 6 Ay</option>
+                            <option value="12">Son 12 Ay</option>
+                            <option value="3">Son 3 Ay</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
-<div class="row mt-5">
-    <div class="col-md-6 mb-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-book me-2"></i>Kitap Yönetimi</h5>
-            </div>
-            <div class="card-body">
-                <p class="card-text">Kitap envanterini görüntüle, yeni kitaplar ekle, mevcut kitapları düzenle veya sil.</p>
-                <div class="row mt-4">
-                    <div class="col">
-                        <a href="{{ url_for('kitaplar.index') }}" class="btn btn-primary w-100">Kitaplara Git</a>
-                    </div>
+        <!-- Hızlı Erişim -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Hızlı Erişim</h5>
                 </div>
-                <div class="row mt-2">
-                    <div class="col-md-4">
-                        <a href="{{ url_for('kitaplar.yazarlar') }}" class="btn btn-outline-secondary w-100">Yazarlar</a>
-                    </div>
-                    <div class="col-md-4">
-                        <a href="{{ url_for('kitaplar.yayinevleri') }}" class="btn btn-outline-secondary w-100">Yayınevleri</a>
-                    </div>
-                    <div class="col-md-4">
-                        <a href="{{ url_for('kitaplar.kategoriler') }}" class="btn btn-outline-secondary w-100">Kategoriler</a>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('satis.yeni') }}" class="btn btn-primary btn-lg mb-3">
+                            <i class="fas fa-cart-plus me-2"></i>Yeni Satış
+                        </a>
+                        <a href="{{ url_for('kitaplar.yeni_kitap') }}" class="btn btn-success btn-lg mb-3">
+                            <i class="fas fa-book-medical me-2"></i>Kitap Ekle
+                        </a>
+                        <a href="{{ url_for('kitaplar.yazarlar') }}" class="btn btn-info btn-lg mb-3">
+                            <i class="fas fa-user-edit me-2"></i>Yazarları Yönet
+                        </a>
+                        <a href="{{ url_for('satis.listele') }}" class="btn btn-warning btn-lg">
+                            <i class="fas fa-list me-2"></i>Satışları Görüntüle
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <div class="col-md-6 mb-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Satış İşlemleri</h5>
-            </div>
-            <div class="card-body">
-                <p class="card-text">Yeni satış yap, günlük satışları görüntüle ve müşteri bilgilerini yönet.</p>
-                <div class="row mt-4">
-                    <div class="col">
-                        <a href="{{ url_for('satis.yeni') }}" class="btn btn-success w-100">Yeni Satış</a>
-                    </div>
-                </div>
-                <div class="row mt-2">
-                    <div class="col-md-6">
-                        <a href="{{ url_for('satis.listele') }}" class="btn btn-outline-secondary w-100">Satış Listesi</a>
-                    </div>
-                    <div class="col-md-6">
-                        <a href="#" class="btn btn-outline-secondary w-100">Müşteriler</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-{% if recent_sales %}
-<div class="row mt-4">
-    <div class="col-md-12">
-        <div class="card shadow-sm">
-            <div class="card-header">
-                <h5 class="mb-0">Son Satışlar</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Satış No</th>
-                                <th>Tarih</th>
-                                <th>Müşteri</th>
-                                <th>Toplam</th>
-                                <th>İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for satis in recent_sales %}
-                            <tr>
-                                <td>{{ satis.SatisID }}</td>
-                                <td>{{ satis.SatisTarihi.strftime('%d.%m.%Y %H:%M') }}</td>
-                                <td>
-                                    {% if satis.musteri %}
-                                    {{ satis.musteri.Ad }} {{ satis.musteri.Soyad }}
-                                    {% else %}
-                                    <span class="text-muted">Misafir</span>
-                                    {% endif %}
-                                </td>
-                                <td>{{ satis.ToplamTutar }} TL</td>
-                                <td>
-                                    <a href="{{ url_for('satis.detay', id=satis.SatisID) }}" class="btn btn-sm btn-info">Detay</a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+    <!-- Son Satışlar -->
+    {% if recent_sales %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Son Satışlar</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Tarih</th>
+                                    <th>Müşteri</th>
+                                    <th>Tutar</th>
+                                    <th class="text-center">Durum</th>
+                                    <th class="text-end">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for satis in recent_sales %}
+                                <tr>
+                                    <td>{{ satis.SatisID }}</td>
+                                    <td><i class="far fa-calendar-alt me-1"></i> {{ satis.SatisTarihi.strftime('%d.%m.%Y %H:%M') }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded-circle p-2 me-2">
+                                                <i class="fas {% if satis.musteri %}fa-user{% else %}fa-user-clock{% endif %}"></i>
+                                            </div>
+                                            <div>
+                                                {% if satis.musteri %}
+                                                {{ satis.musteri.Ad }} {{ satis.musteri.Soyad }}
+                                                {% else %}
+                                                <span class="text-muted">Misafir Müşteri</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><strong>{{ satis.ToplamTutar }} TL</strong></td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success">Tamamlandı</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group">
+                                            <a href="{{ url_for('satis.detay', id=satis.SatisID) }}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i> Detay
+                                            </a>
+                                            <a href="{{ url_for('satis.detay_pdf', id=satis.SatisID) }}" class="btn btn-sm btn-danger" target="_blank">
+                                                <i class="fas fa-file-pdf"></i> PDF
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer text-end">
+                    <a href="{{ url_for('satis.listele') }}" class="btn btn-sm btn-primary">Tüm Satışları Görüntüle</a>
                 </div>
             </div>
         </div>
     </div>
-</div>
-{% endif %}
+    {% endif %}
 
-{% if low_stock_books %}
-<div class="row mt-4">
-    <div class="col-md-12">
-        <div class="card shadow-sm border-danger">
-            <div class="card-header bg-danger text-white">
-                <h5 class="mb-0">Stok Azalan Kitaplar</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Kitap</th>
-                                <th>ISBN</th>
-                                <th>Yazar</th>
-                                <th>Stok</th>
-                                <th>İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for kitap in low_stock_books %}
-                            <tr>
-                                <td>{{ kitap.Ad }}</td>
-                                <td>{{ kitap.ISBN }}</td>
-                                <td>
-                                    {% for yazar in kitap.yazarlar %}
-                                    {{ yazar.Ad }} {{ yazar.Soyad }}{% if not loop.last %}, {% endif %}
-                                    {% endfor %}
-                                </td>
-                                <td>
-                                    <span class="badge bg-danger">{{ kitap.StokAdedi }}</span>
-                                </td>
-                                <td>
-                                    <a href="{{ url_for('kitaplar.duzenle_kitap', id=kitap.KitapID) }}" class="btn btn-sm btn-warning">Düzenle</a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+    <!-- Kritik Stok Uyarıları -->
+    {% if low_stock_books %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white d-flex align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Stok Uyarısı</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Kitap</th>
+                                    <th>ISBN</th>
+                                    <th>Yazar</th>
+                                    <th class="text-center">Stok Durumu</th>
+                                    <th class="text-end">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for kitap in low_stock_books %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded p-2 me-2">
+                                                <i class="fas fa-book text-danger"></i>
+                                            </div>
+                                            <div>{{ kitap.Ad }}</div>
+                                        </div>
+                                    </td>
+                                    <td>{{ kitap.ISBN }}</td>
+                                    <td>
+                                        {% for yazar in kitap.yazarlar %}
+                                        {{ yazar.Ad }} {{ yazar.Soyad }}{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-danger">{{ kitap.StokAdedi }} adet</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{{ url_for('kitaplar.duzenle_kitap', id=kitap.KitapID) }}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i> Düzenle
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer text-end">
+                    <a href="{{ url_for('kitaplar.index') }}" class="btn btn-sm btn-primary">Tüm Kitapları Görüntüle</a>
                 </div>
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
-{% endif %}
 {% endblock %}
 
 {% block extra_js %}
@@ -208,36 +233,83 @@ document.addEventListener('DOMContentLoaded', function() {
             datasets: [{
                 label: 'Aylık Satış Sayısı',
                 data: {{ aylik_satis_sayilari }},
-                backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
+                backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                borderColor: 'rgba(52, 152, 219, 1)',
+                borderWidth: 1,
+                borderRadius: 6,
+                hoverBackgroundColor: 'rgba(52, 152, 219, 0.9)',
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        precision: 0
+                        precision: 0,
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    grid: {
+                        display: true,
+                        drawBorder: false,
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false,
+                        drawBorder: false
                     }
                 }
             },
             plugins: {
                 title: {
                     display: true,
-                    text: 'Son 6 Aylık Satış Verileri'
+                    text: 'Son 6 Aylık Satış Verileri',
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    },
+                    padding: {
+                        bottom: 20
+                    }
+                },
+                legend: {
+                    display: false
                 },
                 tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 14
+                    },
+                    padding: 12,
                     callbacks: {
                         label: function(context) {
-                            return context.dataset.label + ': ' + context.parsed.y + ' satış';
+                            return context.parsed.y + ' adet satış';
                         }
                     }
                 }
             }
         }
     });
+    
+    // Grafik period değiştirme dinleyicisi (gerçek projelerde backend'e istek atılarak veri güncellenebilir)
+    document.getElementById('chartPeriod').addEventListener('change', function() {
+        // Gerçek projelerde burada backend'e istek atılarak veriler güncellenir
+        alert('Gerçek bir projede burada backend\'e istek atarak grafiği güncelleyebilirsiniz.');
+    });
+});
+
+// Kart ve tablolara animasyon ekle
+document.querySelectorAll('.card').forEach((card, index) => {
+    card.style.animationDelay = (index * 0.1) + 's';
+    card.classList.add('fade-in');
 });
 </script>
 {% endblock %}

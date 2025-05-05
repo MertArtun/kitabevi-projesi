@@ -2,89 +2,122 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-md-8 offset-md-2">
+    <div class="col-md-10 offset-md-1">
         <div class="card">
             <div class="card-header">
                 <h4 class="mb-0">{% if form.isbn.data %}Kitap Düzenle{% else %}Yeni Kitap Ekle{% endif %}</h4>
             </div>
             <div class="card-body">
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     {{ form.hidden_tag() }}
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ form.isbn.label(class="form-label") }}
-                            {{ form.isbn(class="form-control") }}
-                            {% for error in form.isbn.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            {{ form.ad.label(class="form-label") }}
-                            {{ form.ad(class="form-control") }}
-                            {% for error in form.ad.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    </div>
                     
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ form.yayin_yili.label(class="form-label") }}
-                            {{ form.yayin_yili(class="form-control") }}
-                            {% for error in form.yayin_yili.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
+                        <div class="col-md-4 mb-4 order-md-2">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Kitap Kapağı</h5>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="mb-3">
+                                        {% if kitap and kitap.KapakResmi and kitap.KapakResmi != 'default_book_cover.jpg' %}
+                                            <img src="{{ url_for('static', filename='img/kitap_kapaklari/' + kitap.KapakResmi) }}" 
+                                                alt="{{ kitap.Ad }}" class="img-fluid mb-2 rounded book-cover-preview">
+                                        {% else %}
+                                            <img src="{{ url_for('static', filename='img/kitap_kapaklari/default_book_cover.jpg') }}" 
+                                                alt="Varsayılan Kapak" class="img-fluid mb-2 rounded book-cover-preview">
+                                        {% endif %}
+                                        
+                                        <div class="form-file">
+                                            {{ form.kapak_resmi.label(class="form-label") }}
+                                            {{ form.kapak_resmi(class="form-control", onchange="previewImage(this)") }}
+                                            <div class="form-text">Önerilen boyut: 500x750 piksel</div>
+                                            {% for error in form.kapak_resmi.errors %}
+                                                <span class="text-danger">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            {{ form.sayfa_sayisi.label(class="form-label") }}
-                            {{ form.sayfa_sayisi(class="form-control") }}
-                            {% for error in form.sayfa_sayisi.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
+                        
+                        <div class="col-md-8 mb-3 order-md-1">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.isbn.label(class="form-label") }}
+                                    {{ form.isbn(class="form-control") }}
+                                    {% for error in form.isbn.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.ad.label(class="form-label") }}
+                                    {{ form.ad(class="form-control") }}
+                                    {% for error in form.ad.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.yayin_yili.label(class="form-label") }}
+                                    {{ form.yayin_yili(class="form-control") }}
+                                    {% for error in form.yayin_yili.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.sayfa_sayisi.label(class="form-label") }}
+                                    {{ form.sayfa_sayisi(class="form-control") }}
+                                    {% for error in form.sayfa_sayisi.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.fiyat.label(class="form-label") }}
+                                    {{ form.fiyat(class="form-control") }}
+                                    {% for error in form.fiyat.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.stok_adedi.label(class="form-label") }}
+                                    {{ form.stok_adedi(class="form-control") }}
+                                    {% for error in form.stok_adedi.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.yayinevi_id.label(class="form-label") }}
+                                    {{ form.yayinevi_id(class="form-select") }}
+                                    {% for error in form.yayinevi_id.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.kategori_id.label(class="form-label") }}
+                                    {{ form.kategori_id(class="form-select") }}
+                                    {% for error in form.kategori_id.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.yazar_ids.label(class="form-label") }}
+                                {{ form.yazar_ids(class="form-select", size=5, multiple=true) }}
+                                <div class="form-text">Birden fazla seçim için Ctrl tuşunu basılı tutun.</div>
+                                {% for error in form.yazar_ids.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ form.fiyat.label(class="form-label") }}
-                            {{ form.fiyat(class="form-control") }}
-                            {% for error in form.fiyat.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            {{ form.stok_adedi.label(class="form-label") }}
-                            {{ form.stok_adedi(class="form-control") }}
-                            {% for error in form.stok_adedi.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ form.yayinevi_id.label(class="form-label") }}
-                            {{ form.yayinevi_id(class="form-select") }}
-                            {% for error in form.yayinevi_id.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            {{ form.kategori_id.label(class="form-label") }}
-                            {{ form.kategori_id(class="form-select") }}
-                            {% for error in form.kategori_id.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        {{ form.yazar_ids.label(class="form-label") }}
-                        {{ form.yazar_ids(class="form-select", size=5, multiple=true) }}
-                        <div class="form-text">Birden fazla seçim için Ctrl tuşunu basılı tutun.</div>
-                        {% for error in form.yazar_ids.errors %}
-                        <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
                     </div>
                     
                     <div class="d-flex justify-content-between">
@@ -96,4 +129,20 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            
+            reader.onload = function(e) {
+                document.querySelector('.book-cover-preview').src = e.target.result;
+            }
+            
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
 {% endblock %}

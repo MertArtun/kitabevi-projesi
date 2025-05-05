@@ -1,83 +1,294 @@
-/* Ana stil tanımlamaları */
+/* Tema Değişkenleri */
+:root {
+    /* Açık Tema (Varsayılan) */
+    --primary-color: #3498db;
+    --secondary-color: #2c3e50;
+    --accent-color: #e74c3c;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --success-color: #2ecc71;
+    --warning-color: #f39c12;
+    --danger-color: #e74c3c;
+    
+    /* Arka plan ve metin renkleri */
+    --bg-color: #f8f9fa;
+    --bg-card: #ffffff;
+    --text-color: #333333;
+    --text-muted: #6c757d;
+    --border-color: rgba(0, 0, 0, 0.1);
+    --box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+    
+    /* Sabit değişkenler */
+    --border-radius: 0.5rem;
+    --transition: all 0.3s ease;
+}
+
+/* Koyu Tema */
+[data-theme="dark"] {
+    --primary-color: #4dabf5;
+    --secondary-color: #384e63;
+    --accent-color: #ff6b6b;
+    --light-color: #2d3436;
+    --dark-color: #1e272e;
+    --success-color: #26de81;
+    --warning-color: #f39c12;
+    --danger-color: #ff6b6b;
+    
+    /* Arka plan ve metin renkleri */
+    --bg-color: #121212;
+    --bg-card: #1e1e1e;
+    --text-color: #e0e0e0;
+    --text-muted: #a0a0a0;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.3);
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
+    background-color: var(--bg-color);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    color: var(--text-color);
+    line-height: 1.6;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .container {
     flex: 1;
+    padding: 1.5rem 15px;
+}
+
+/* Tema değiştirici */
+.theme-switcher {
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    width: 38px;
+    height: 38px;
+}
+
+.theme-switcher:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Navbar Stilleri */
 .navbar {
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, var(--secondary-color), var(--dark-color));
+    padding: 0.7rem 1rem;
 }
 
 .navbar-brand {
     font-weight: bold;
     font-size: 1.5rem;
+    letter-spacing: 0.5px;
 }
 
 .navbar-dark .navbar-nav .nav-link {
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    padding: 0.7rem 1rem;
+    border-radius: 4px;
+    transition: var(--transition);
 }
 
 .navbar-dark .navbar-nav .nav-link:hover {
     color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.navbar-dark .navbar-nav .active > .nav-link {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: white;
 }
 
 /* Kart Stilleri */
 .card {
     border: none;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    box-shadow: var(--box-shadow);
     margin-bottom: 1.5rem;
-    border-radius: 0.5rem;
+    border-radius: var(--border-radius);
     overflow: hidden;
+    transition: var(--transition);
+    background-color: var(--bg-card);
 }
 
 .card-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #e9ecef;
-    padding: 1rem 1.25rem;
+    background: linear-gradient(to right, var(--light-color), var(--bg-card));
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.2rem 1.5rem;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--text-color);
 }
 
 .card:hover {
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    box-shadow: 0 0.8rem 2rem rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Dashboard kartları */
+.dashboard-stat-card {
+    text-align: center;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-stat-card h3 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+.dashboard-stat-card p {
+    font-size: 1rem;
+    opacity: 0.8;
+    margin-bottom: 0;
+}
+
+.dashboard-stat-card i {
+    position: absolute;
+    right: 1.5rem;
+    top: 1.5rem;
+    font-size: 2rem;
+    opacity: 0.2;
+}
+
+.dashboard-stat-card.primary {
+    background: linear-gradient(135deg, var(--primary-color), #5dade2);
+    color: white;
+}
+
+.dashboard-stat-card.success {
+    background: linear-gradient(135deg, var(--success-color), #58d68d);
+    color: white;
+}
+
+.dashboard-stat-card.warning {
+    background: linear-gradient(135deg, var(--warning-color), #f5b041);
+    color: white;
+}
+
+.dashboard-stat-card.danger {
+    background: linear-gradient(135deg, var(--danger-color), #ec7063);
+    color: white;
 }
 
 /* Tablo Stilleri */
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    color: var(--text-color);
+}
+
 .table th {
     font-weight: 600;
-    background-color: #f8f9fa;
+    background-color: rgba(0, 0, 0, 0.03);
+    color: var(--text-color);
+    border-top: none;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.table td {
+    vertical-align: middle;
+    border-color: var(--border-color);
 }
 
 .table-hover tbody tr:hover {
-    background-color: rgba(0, 123, 255, 0.05);
+    background-color: rgba(52, 152, 219, 0.05);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.02);
 }
 
 /* Form Stilleri */
-.form-control:focus {
-    border-color: #80bdff;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+.form-control {
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    padding: 0.6rem 1rem;
+    transition: var(--transition);
+    background-color: var(--bg-card);
+    color: var(--text-color);
 }
 
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    background-color: var(--bg-card);
+    color: var(--text-color);
+}
+
+.form-select {
+    background-color: var(--bg-card);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+/* Buton Stilleri */
 .btn {
-    border-radius: 0.3rem;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    padding: 0.6rem 1.2rem;
+    transition: var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
 }
 
 .btn-primary {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
+    background: linear-gradient(135deg, var(--primary-color), #2980b9);
+    border: none;
 }
 
 .btn-primary:hover {
-    background-color: #0b5ed7;
-    border-color: #0a58ca;
+    background: linear-gradient(135deg, #2980b9, #1a5276);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--success-color), #27ae60);
+    border: none;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #27ae60, #1e8449);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger-color), #c0392b);
+    border: none;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #c0392b, #922b21);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
 }
 
 /* Sayfalama Stilleri */
@@ -86,19 +297,32 @@ body {
 }
 
 .page-item.active .page-link {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
+    background: linear-gradient(135deg, var(--primary-color), #2980b9);
+    border-color: var(--primary-color);
 }
 
-/* Ana Sayfa Dashboard Stilleri */
-.display-4 {
-    font-weight: 600;
+.page-link {
+    color: var(--primary-color);
+    border-radius: 4px;
+    margin: 0 2px;
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+.page-link:hover {
+    color: var(--secondary-color);
+    background-color: rgba(52, 152, 219, 0.1);
 }
 
 /* Sepet Stilleri */
 .cart-item {
     padding: 15px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.cart-item:hover {
+    background-color: rgba(52, 152, 219, 0.05);
 }
 
 .cart-item:last-child {
@@ -107,36 +331,170 @@ body {
 
 .cart-total {
     font-weight: bold;
-    font-size: 1.1em;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #eee;
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px dashed var(--border-color);
+    text-align: right;
 }
 
 /* İstatistik Kutuları */
-.card .border-end {
-    border-right: 1px solid rgba(0, 0, 0, 0.125);
+.stats-container {
+    margin-bottom: 2rem;
+}
+
+/* Arama kutusu */
+.search-box {
+    position: relative;
+}
+
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    max-height: 400px;
+    overflow-y: auto;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    background-color: var(--bg-card);
+}
+
+.search-box .dropdown-item {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition);
+    color: var(--text-color);
+}
+
+.search-box .dropdown-item:hover {
+    background-color: rgba(52, 152, 219, 0.05);
+}
+
+/* Badge stilleri */
+.badge {
+    font-weight: 500;
+    padding: 0.5em 1em;
+    border-radius: 50rem;
 }
 
 /* Footer */
 footer {
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+    background-color: var(--dark-color);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 2rem 0;
     margin-top: auto;
 }
 
-/* Responsive İyileştirmeler */
-@media (max-width: 768px) {
-    .card .border-end {
-        border-right: none;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
-        padding-bottom: 1rem;
-        margin-bottom: 1rem;
-    }
+footer a {
+    color: rgba(255, 255, 255, 0.8);
+    transition: var(--transition);
+}
+
+footer a:hover {
+    color: white;
+    text-decoration: none;
+}
+
+/* Dropdown Menüler */
+.dropdown-menu {
+    background-color: var(--bg-card);
+    box-shadow: var(--box-shadow);
+    border: 1px solid var(--border-color);
+}
+
+.dropdown-item {
+    color: var(--text-color);
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+    color: var(--text-color);
+    background-color: rgba(52, 152, 219, 0.05);
+}
+
+.dropdown-item.active, .dropdown-item:active {
+    color: white;
+    background-color: var(--primary-color);
+}
+
+/* Uyarılar */
+.alert {
+    border: none;
+    border-radius: var(--border-radius);
 }
 
 /* Animasyonlar */
-.btn, .card, .form-control {
-    transition: all 0.3s ease;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-20px); }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* Sayfa Geçiş Animasyonu */
+@keyframes pageTransition {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.page-transition {
+    animation: pageTransition 0.4s ease-out;
+}
+
+/* Grafik container */
+.chart-container {
+    position: relative;
+    margin: auto;
+    height: 300px;
+    margin-bottom: 2rem;
+}
+
+/* Responsive İyileştirmeler */
+@media (max-width: 991.98px) {
+    .navbar-dark .navbar-nav .nav-link {
+        padding: 0.5rem 0.7rem;
+    }
+    
+    .container {
+        padding: 1rem 10px;
+    }
+    
+    .card-header {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .dashboard-stat-card {
+        margin-bottom: 1rem;
+    }
+    
+    .card .border-end {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    h1, .h1 {
+        font-size: 1.8rem;
+    }
+    
+    h2, .h2 {
+        font-size: 1.5rem;
+    }
 }
 
 /* Yazdırma için */

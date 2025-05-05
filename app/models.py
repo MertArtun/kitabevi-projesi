@@ -52,6 +52,7 @@ class Kitap(db.Model):
     StokAdedi = db.Column(db.Integer, nullable=False, default=0)
     YayineviID = db.Column(db.Integer, db.ForeignKey('Yayinevleri.YayineviID'), nullable=False)
     KategoriID = db.Column(db.Integer, db.ForeignKey('Kategoriler.KategoriID'), nullable=False)
+    KapakResmi = db.Column(db.String(255), nullable=True, default='default_book_cover.jpg')
     
     yazarlar = db.relationship('Yazar', secondary=kitap_yazar, lazy='subquery',
         backref=db.backref('kitaplar', lazy=True))

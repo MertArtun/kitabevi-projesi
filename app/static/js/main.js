@@ -2,6 +2,9 @@
 
 // DOM yüklendikten sonra çalışacak fonksiyonlar
 document.addEventListener('DOMContentLoaded', function() {
+    // Sayfa geçiş animasyonlarını yönet
+    initPageTransitions();
+    
     // Sepete ekleme formu varsa
     const sepetForm = document.getElementById('sepeteEkleForm');
     if (sepetForm) {
@@ -66,4 +69,85 @@ document.addEventListener('DOMContentLoaded', function() {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
     }
+
+    // Tablolar için satır animasyonları
+    initTableRowAnimations();
+
+    // Kart animasyonları
+    initCardAnimations();
 });
+
+/**
+ * Sayfa geçişlerini yönetir
+ * Linklere tıklandığında sayfa geçişi animasyonu ekler
+ */
+function initPageTransitions() {
+    // Tüm navigasyon bağlantılarını seç (navbar içindeki link ve dropdown itemlar)
+    const navLinks = document.querySelectorAll('.navbar-nav a.nav-link:not(.dropdown-toggle), .dropdown-menu a.dropdown-item');
+    
+    // Ana içerik bölümü
+    const contentContainer = document.querySelector('.page-transition');
+    
+    // Her link için event listener ekle
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Dropdown toggle linkleri ve PDF gibi dış bağlantıları atla
+            if (link.classList.contains('dropdown-toggle') || link.getAttribute('target') === '_blank') {
+                return;
+            }
+            
+            // Mevcut sayfadaki linke tıklama durumunda animasyonu engelle
+            const href = link.getAttribute('href');
+            if (href === window.location.pathname) {
+                return;
+            }
+            
+            // Sayfa geçiş animasyonu için olayı engelle
+            e.preventDefault();
+            
+            // Çıkış animasyonu
+            contentContainer.style.animation = 'fadeOut 0.3s forwards';
+            
+            // Animasyon tamamlandıktan sonra sayfaya yönlendir
+            setTimeout(() => {
+                window.location.href = href;
+            }, 300);
+        });
+    });
+    
+    // Sayfa yüklendiğinde giriş animasyonu
+    if (contentContainer) {
+        contentContainer.style.animation = 'pageTransition 0.5s forwards';
+    }
+}
+
+/**
+ * Tablo satırları için kademeli animasyon ekler
+ */
+function initTableRowAnimations() {
+    const tables = document.querySelectorAll('.table');
+    tables.forEach(table => {
+        const tbody = table.querySelector('tbody');
+        if (tbody) {
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateY(10px)';
+                row.style.animation = `fadeIn 0.3s ${index * 0.05}s forwards`;
+            });
+        }
+    });
+}
+
+/**
+ * Kartlar için kademeli animasyon ekler
+ */
+function initCardAnimations() {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+        if (!card.classList.contains('fade-in')) {
+            card.classList.add('fade-in');
+            card.style.animationDelay = `${index * 0.1}s`;
+        }
+    });
+}

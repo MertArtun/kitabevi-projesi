@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, IntegerField, DecimalField, TextAreaField, SelectField, SelectMultipleField, SubmitField
 from wtforms.validators import DataRequired, NumberRange, Length
 from app.models import Yayinevi, Kategori, Yazar
@@ -13,6 +14,9 @@ class KitapForm(FlaskForm):
     yayinevi_id = SelectField('Yayınevi', coerce=int, validators=[DataRequired()])
     kategori_id = SelectField('Kategori', coerce=int, validators=[DataRequired()])
     yazar_ids = SelectMultipleField('Yazarlar', coerce=int, validators=[DataRequired()])
+    kapak_resmi = FileField('Kitap Kapağı', validators=[
+        FileAllowed(['jpg', 'png', 'jpeg'], 'Sadece resim dosyaları (JPG, PNG) yüklenebilir!')
+    ])
     submit = SubmitField('Kaydet')
 
     def __init__(self, *args, **kwargs):

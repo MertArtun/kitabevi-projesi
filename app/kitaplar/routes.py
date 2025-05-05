@@ -1,10 +1,83 @@
-from flask import render_template, redirect, url_for, flash, request, jsonify
+from flask import render_template, redirect, url_for, flash, request, jsonify, current_app
 from flask_login import login_required, current_user
 from app import db
 from app.kitaplar import bp
 from app.kitaplar.forms import KitapForm, YazarForm, YayineviForm, KategoriForm
 from app.models import Kitap, Yazar, Yayinevi, Kategori
 from sqlalchemy import or_
+import os
+from werkzeug.utils import secure_filename
+import uuid
+import shutil
+from PIL import Image
+
+# Güvenli dosya adı oluşturma
+def save_book_cover(kapak_resmi):
+    if not kapak_resmi:
+        return 'default_book_cover.jpg'
+    
+    # Benzersiz dosya adı oluştur
+    _, ext = os.path.splitext(kapak_resmi.filename)
+    filename = secure_filename(f"{uuid.uuid4()}{ext}")
+    
+    # Kapak resimleri klasörünü kontrol et/oluştur
+    kapak_klasoru = os.path.join(current_app.root_path, 'static', 'img', 'kitap_kapaklari')
+    if not os.path.exists(kapak_klasoru):
+        os.makedirs(kapak_klasoru)
+    
+    # Dosyayı kaydet
+    kapak_resmi_yolu = os.path.join(kapak_klasoru, filename)
+    kapak_resmi.save(kapak_resmi_yolu)
+    
+    # Resim boyutunu kontrol et ve gerekirse yeniden boyutlandır (opsiyonel)
+    try:
+        with Image.open(kapak_resmi_yolu) as img:
+            # Maksimum boyut: 800x1200
+            max_size = (800, 1200)
+            if img.width > max_size[0] or img.height > max_size[1]:
+                img.thumbnail(max_size, Image.LANCZOS)
+                img.save(kapak_resmi_yolu)
+    except Exception as e:
+        current_app.logger.error(f"Resim işleme hatası: {e}")
+    
+    return filename
+
+# Varsayılan kapak resmini kontrol et/oluştur
+def ensure_default_cover_exists():
+    kapak_klasoru = os.path.join(current_app.root_path, 'static', 'img', 'kitap_kapaklari')
+    default_kapak = os.path.join(kapak_klasoru, 'default_book_cover.jpg')
+    
+    # Klasörü kontrol et
+    if not os.path.exists(kapak_klasoru):
+        os.makedirs(kapak_klasoru)
+    
+    # Varsayılan kapak resmi yoksa, sistem varsayılanını kullan
+    # NOT: Gerçek bir proje için, statik klasörünüzde bir varsayılan resim bulundurmalı ve
+    # buraya kopyalamalısınız.
+    if not os.path.exists(default_kapak):
+        # Basit bir varsayılan resim oluştur (gerçek projede bu statik bir dosyadan kopyalanmalı)
+        from PIL import Image, ImageDraw, ImageFont
+        
+        # 400x600 boyutunda gri bir resim oluştur
+        img = Image.new('RGB', (400, 600), color=(240, 240, 240))
+        d = ImageDraw.Draw(img)
+        
+        # Resmin ortasına metin ekle
+        try:
+            # Standart yazı tipi kullan (sisteme bağlıdır)
+            d.text((200, 300), "Kapak Yok", fill=(80, 80, 80), anchor="mm")
+        except Exception as e:
+            current_app.logger.error(f"Font hatası: {e}")
+            # Temel çizim ile basit bir çerçeve çiz
+            d.rectangle([(20, 20), (380, 580)], outline=(80, 80, 80), width=2)
+            
+        # Resmi kaydet
+        img.save(default_kapak)
+
+# Uygulama başladığında varsayılan kapak resmini kontrol et
+@bp.before_app_first_request
+def setup_default_images():
+    ensure_default_cover_exists()
 
 @bp.route('/')
 @login_required
@@ -37,6 +110,13 @@ def index():
 def yeni_kitap():
     form = KitapForm()
     if form.validate_on_submit():
+        # Kapak resmi yükleme işlemi
+        kapak_resmi_dosyasi = form.kapak_resmi.data
+        kapak_resmi_adi = 'default_book_cover.jpg'
+        
+        if kapak_resmi_dosyasi:
+            kapak_resmi_adi = save_book_cover(kapak_resmi_dosyasi)
+        
         kitap = Kitap(ISBN=form.isbn.data,
                      Ad=form.ad.data,
                      YayinYili=form.yayin_yili.data,
@@ -44,7 +124,8 @@ def yeni_kitap():
                      Fiyat=form.fiyat.data,
                      StokAdedi=form.stok_adedi.data,
                      YayineviID=form.yayinevi_id.data,
-                     KategoriID=form.kategori_id.data)
+                     KategoriID=form.kategori_id.data,
+                     KapakResmi=kapak_resmi_adi)
         
         for yazar_id in form.yazar_ids.data:
             yazar = Yazar.query.get(yazar_id)
@@ -69,6 +150,19 @@ def duzenle_kitap(id):
         form.yazar_ids.data = [yazar.YazarID for yazar in kitap.yazarlar]
     
     if form.validate_on_submit():
+        # Kapak resmi yükleme işlemi
+        kapak_resmi_dosyasi = form.kapak_resmi.data
+        
+        if kapak_resmi_dosyasi:
+            # Eski kapak resmini silme işlemi (varsayılan değilse)
+            if kitap.KapakResmi != 'default_book_cover.jpg':
+                eski_kapak_yolu = os.path.join(current_app.root_path, 'static', 'img', 'kitap_kapaklari', kitap.KapakResmi)
+                if os.path.exists(eski_kapak_yolu):
+                    os.remove(eski_kapak_yolu)
+            
+            # Yeni kapak resmini kaydet
+            kitap.KapakResmi = save_book_cover(kapak_resmi_dosyasi)
+        
         kitap.ISBN = form.isbn.data
         kitap.Ad = form.ad.data
         kitap.YayinYili = form.yayin_yili.data
@@ -88,12 +182,19 @@ def duzenle_kitap(id):
         db.session.commit()
         flash('Kitap başarıyla güncellendi!')
         return redirect(url_for('kitaplar.index'))
-    return render_template('kitaplar/form.html', title='Kitap Düzenle', form=form)
+    return render_template('kitaplar/form.html', title='Kitap Düzenle', form=form, kitap=kitap)
 
 @bp.route('/sil/<int:id>', methods=['POST'])
 @login_required
 def sil_kitap(id):
     kitap = Kitap.query.get_or_404(id)
+    
+    # Kapak resmini sil (varsayılan değilse)
+    if kitap.KapakResmi and kitap.KapakResmi != 'default_book_cover.jpg':
+        kapak_yolu = os.path.join(current_app.root_path, 'static', 'img', 'kitap_kapaklari', kitap.KapakResmi)
+        if os.path.exists(kapak_yolu):
+            os.remove(kapak_yolu)
+    
     db.session.delete(kitap)
     db.session.commit()
     flash('Kitap başarıyla silindi!')
@@ -118,7 +219,7 @@ def yeni_yazar():
         db.session.commit()
         flash('Yazar başarıyla eklendi!')
         return redirect(url_for('kitaplar.yazarlar'))
-    return render_template('kitaplar/yazar_form.html', title='Yeni Yazar', form=form)
+    return render_template('kitaplar/yazar_form.html', title='Yeni Yazar Ekle', form=form)
 
 @bp.route('/yazarlar/duzenle/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -135,7 +236,7 @@ def duzenle_yazar(id):
         flash('Yazar başarıyla güncellendi!')
         return redirect(url_for('kitaplar.yazarlar'))
     
-    return render_template('kitaplar/yazar_form.html', title='Yazar Düzenle', form=form)
+    return render_template('kitaplar/yazar_form.html', title=f'Yazar Düzenle: {yazar.Ad} {yazar.Soyad}', form=form)
 
 @bp.route('/yazarlar/sil/<int:id>', methods=['POST'])
 @login_required
@@ -170,7 +271,7 @@ def yeni_yayinevi():
         db.session.commit()
         flash('Yayınevi başarıyla eklendi!')
         return redirect(url_for('kitaplar.yayinevleri'))
-    return render_template('kitaplar/yayinevi_form.html', title='Yeni Yayınevi', form=form)
+    return render_template('kitaplar/yayinevi_form.html', title='Yeni Yayınevi Ekle', form=form)
 
 @bp.route('/yayinevleri/duzenle/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -187,7 +288,7 @@ def duzenle_yayinevi(id):
         flash('Yayınevi başarıyla güncellendi!')
         return redirect(url_for('kitaplar.yayinevleri'))
     
-    return render_template('kitaplar/yayinevi_form.html', title='Yayınevi Düzenle', form=form)
+    return render_template('kitaplar/yayinevi_form.html', title=f'Yayınevi Düzenle: {yayinevi.Ad}', form=form)
 
 @bp.route('/yayinevleri/sil/<int:id>', methods=['POST'])
 @login_required
@@ -220,7 +321,7 @@ def yeni_kategori():
         db.session.commit()
         flash('Kategori başarıyla eklendi!')
         return redirect(url_for('kitaplar.kategoriler'))
-    return render_template('kitaplar/kategori_form.html', title='Yeni Kategori', form=form)
+    return render_template('kitaplar/kategori_form.html', title='Yeni Kategori Ekle', form=form)
 
 @bp.route('/kategoriler/duzenle/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -235,7 +336,7 @@ def duzenle_kategori(id):
         flash('Kategori başarıyla güncellendi!')
         return redirect(url_for('kitaplar.kategoriler'))
     
-    return render_template('kitaplar/kategori_form.html', title='Kategori Düzenle', form=form)
+    return render_template('kitaplar/kategori_form.html', title=f'Kategori Düzenle: {kategori.Ad}', form=form)
 
 @bp.route('/kategoriler/sil/<int:id>', methods=['POST'])
 @login_required

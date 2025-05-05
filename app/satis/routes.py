@@ -1,6 +1,7 @@
 from flask import render_template, redirect, url_for, flash, request, session, make_response
 from flask_login import login_required, current_user
-from flask_weasyprint import HTML, render_pdf
+# PDF özelliği geçici olarak devre dışı bırakılmıştır
+# from flask_weasyprint import HTML, render_pdf
 from app import db
 from app.satis import bp
 from app.satis.forms import MusteriSecForm, YeniMusteriForm, SepeteEkleForm, SatisTamamlaForm
@@ -105,13 +106,24 @@ def tamamla():
         db.session.add(satis)
         db.session.flush()  # ID'yi almak için veritabanını güncelle
         
-        # Satış detayları oluştur
+        # Satış detayları oluştur ve stokları güncelle
         for item in session['sepet']:
-            detay = SatisDetay(SatisID=satis.SatisID,
-                             KitapID=item['kitap_id'],
-                             Adet=item['adet'],
-                             BirimFiyat=item['birim_fiyat'])
-            db.session.add(detay)
+            kitap = Kitap.query.get(item['kitap_id'])
+            if kitap:
+                if kitap.StokAdedi < item['adet']:
+                    db.session.rollback()
+                    flash(f'Hata: "{kitap.Ad}" için yeterli stok yok. Mevcut stok: {kitap.StokAdedi}', 'danger')
+                    return redirect(url_for('satis.sepet'))
+                
+                # Kitap stoğunu azalt
+                kitap.StokAdedi -= item['adet']
+                
+                # Satış detayı ekle
+                detay = SatisDetay(SatisID=satis.SatisID,
+                                KitapID=kitap.KitapID,
+                                Adet=item['adet'],
+                                BirimFiyat=item['birim_fiyat'])
+                db.session.add(detay)
         
         try:
             db.session.commit()
@@ -133,27 +145,30 @@ def detay(id):
     satis = Satis.query.get_or_404(id)
     return render_template('satis/detay.html', title='Satış Detayı', satis=satis)
 
+# PDF özelliği geçici olarak devre dışı bırakılmıştır
 @bp.route('/detay/<int:id>/pdf')
 @login_required
 def detay_pdf(id):
     satis = Satis.query.get_or_404(id)
+    flash('PDF oluşturma özelliği geçici olarak devre dışı bırakılmıştır.', 'warning')
+    return redirect(url_for('satis.detay', id=id))
     
-    # PDF şablonunu oluştur
-    html = render_template('satis/pdf_rapor.html', 
-                          satis=satis,
-                          tarih=datetime.now().strftime('%d.%m.%Y %H:%M'))
+    # # PDF şablonunu oluştur
+    # html = render_template('satis/pdf_rapor.html', 
+    #                       satis=satis,
+    #                       tarih=datetime.now().strftime('%d.%m.%Y %H:%M'))
     
-    # PDF dosyasını oluştur
-    response = make_response(render_pdf(HTML(string=html)))
+    # # PDF dosyasını oluştur
+    # response = make_response(render_pdf(HTML(string=html)))
     
-    # Dosya adı belirle
-    filename = f"satis_rapor_{satis.SatisID}_{datetime.now().strftime('%Y%m%d%H%M')}.pdf"
+    # # Dosya adı belirle
+    # filename = f"satis_rapor_{satis.SatisID}_{datetime.now().strftime('%Y%m%d%H%M')}.pdf"
     
-    # Tarayıcıya indirilecek dosya olarak belirt
-    response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+    # # Tarayıcıya indirilecek dosya olarak belirt
+    # response.headers['Content-Type'] = 'application/pdf'
+    # response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
     
-    return response
+    # return response
 
 @bp.route('/listele')
 @login_required
