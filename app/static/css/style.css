@@ -131,6 +131,7 @@ body {
     color: var(--text-color);
     border-top-left-radius: var(--border-radius);
     border-top-right-radius: var(--border-radius);
+    letter-spacing: 0.5px;
 }
 
 .card:hover {
@@ -251,6 +252,48 @@ body {
     font-weight: 500;
     margin-bottom: 0.5rem;
     color: var(--text-color);
+}
+
+/* Placeholder stilleri */
+.form-control::placeholder {
+    color: var(--text-muted);
+    opacity: 0.8; /* Biraz daha soluk olması için */
+}
+
+.form-control::-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: var(--text-muted);
+    opacity: 0.8;
+}
+
+.form-control::ms-input-placeholder { /* Microsoft Edge */
+    color: var(--text-muted);
+    opacity: 0.8;
+}
+
+/* Validasyon mesajları için iyileştirmeler */
+.valid-feedback,
+.invalid-feedback {
+    font-size: 0.9em; /* Biraz daha okunaklı font boyutu */
+    display: block; /* Her zaman görünür olması için (Bootstrap'te form-control kardeş elemanı olarak gizlenebilir) */
+    width: 100%;
+    margin-top: .25rem;
+}
+
+.valid-feedback::before,
+.invalid-feedback::before {
+    font-family: "Font Awesome 5 Free"; 
+    margin-right: 0.5em;
+    font-weight: 900; /* Solid ikonlar için */
+}
+
+.valid-feedback::before {
+    content: "\f058"; /* fa-check-circle */
+    /* color: var(--bs-success); Bootstrap zaten rengi ayarlıyor olmalı */
+}
+
+.invalid-feedback::before {
+    content: "\f071"; /* fa-exclamation-triangle */
+    /* color: var(--bs-danger); Bootstrap zaten rengi ayarlıyor olmalı */
 }
 
 /* Buton Stilleri */
@@ -540,4 +583,39 @@ footer a:hover {
     body {
         background-color: #fff !important;
     }
+}
+
+/* Sayfa Başlıkları İçin Genel İyileştirme */
+.display-1, .display-2, .display-3, .display-4, .display-5, .display-6 {
+    font-weight: 600; /* Bootstrap'in varsayılanından biraz daha ince bir bold */
+    letter-spacing: 0.5px; /* Başlıklara harf aralığı */
+}
+
+/* Boş Durum (Empty State) Mesajları İçin Stiller */
+.empty-state-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+    background-color: var(--bg-card); /* Kart arka planıyla uyumlu */
+    border: 2px dashed var(--border-color);
+    border-radius: var(--border-radius);
+    min-height: 150px; 
+    margin: 1rem 0; /* Üst ve alt boşluk */
+}
+
+/* İkonlar HTML'e eklenecekse diye örnek bir stil:
+.empty-state-message i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.7;
+}
+*/
+
+.empty-state-message p {
+    font-size: 1.1rem;
+    margin-bottom: 0;
 }

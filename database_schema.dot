@@ -1,0 +1,26 @@
+digraph G {
+  rankdir=LR;
+  node [shape=record, fontname="Arial", fontsize=12];
+  edge [fontname="Arial", fontsize=10];
+  // Set graph attributes
+  graph [bgcolor="#F5F5F5", splines=polyline];
+  // Define node styles for different types of entities
+  node [style=filled, fillcolor="#E3F2FD"];
+  "Yazarlar" [label="Yazarlar|{'\n'.join(attributes)}", fillcolor="#E8F5E9"];
+  "Yayinevleri" [label="Yayinevleri|{'\n'.join(attributes)}", fillcolor="#E8F5E9"];
+  "Kategoriler" [label="Kategoriler|{'\n'.join(attributes)}", fillcolor="#E8F5E9"];
+  "Kitaplar" [label="Kitaplar|{'\n'.join(attributes)}", fillcolor="#FFECB3"];
+  "Musteriler" [label="Musteriler|{'\n'.join(attributes)}", fillcolor="#E1BEE7"];
+  "Personeller" [label="Personeller|{'\n'.join(attributes)}", fillcolor="#E1BEE7"];
+  "Satislar" [label="Satislar|{'\n'.join(attributes)}", fillcolor="#FFCDD2"];
+  "SatisDetaylari" [label="SatisDetaylari|{'\n'.join(attributes)}", fillcolor="#FFCDD2"];
+  "Kitaplar" -> "Kategoriler" [label="  KategoriID  ", color="#2196F3", penwidth=1.5];
+  "Kitaplar" -> "Yayinevleri" [label="  YayineviID  ", color="#2196F3", penwidth=1.5];
+  "Satislar" -> "Musteriler" [label="  MusteriID  ", color="#2196F3", penwidth=1.5];
+  "Satislar" -> "Personeller" [label="  PersonelID  ", color="#2196F3", penwidth=1.5];
+  "SatisDetaylari" -> "Kitaplar" [label="  KitapID  ", color="#2196F3", penwidth=1.5];
+  "SatisDetaylari" -> "Satislar" [label="  SatisID  ", color="#2196F3", penwidth=1.5];
+  "KitapYazarlari" [label="KitapYazarlari|{KitapID : INTEGER [PK, FK]\nYazarID : INTEGER [PK, FK]}", fillcolor="#FFF9C4"];
+  "KitapYazarlari" -> "Kitaplar" [label="  KitapID  ", color="#4CAF50", penwidth=1.5, style="dashed"];
+  "KitapYazarlari" -> "Yazarlar" [label="  YazarID  ", color="#4CAF50", penwidth=1.5, style="dashed"];
+}

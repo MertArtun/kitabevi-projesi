@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ title }}</h1>
+<p><strong>Toplam Satış Sayısı:</strong> {{ toplam_satis }}</p>
+<p><strong>Toplam Tutar:</strong> {{ '{:,.2f}'.format(toplam_tutar) }} TL</p>
+{% endblock %} 

@@ -14,11 +14,11 @@ Bu proje, bir kitabevinin temel operasyonlarını (kitap yönetimi, müşteri y�
 ## Kurulum ve Çalıştırma (SQLite ile)
 1. Repoyu klonlayın:
    ```bash
-   git clone https://github.com/kullanici/kitabevi-projesi.git
+   git clone https://github.com/MertArtun/kitabevi-projesi.git
    cd kitabevi-projesi
    ```
 
-2. SQLite kurulum betiğini çalıştırın:
+2. SQLite kurulum betiğini çalıştırın (Opsiyonel, manuel kurulum adımları aşağıdadır):
    ```bash
    # macOS/Linux için
    chmod +x sqlite_kurulum.sh
@@ -34,7 +34,7 @@ Bu proje, bir kitabevinin temel operasyonlarını (kitap yönetimi, müşteri y�
       python -m venv venv
 
       # Windows
-      venv\Scripts\activate
+      venv\\Scripts\\activate
 
       # macOS/Linux
       source venv/bin/activate
@@ -47,26 +47,27 @@ Bu proje, bir kitabevinin temel operasyonlarını (kitap yönetimi, müşteri y�
 
    c. Veritabanını oluşturun ve migrate edin:
       ```bash
-      export FLASK_APP=run.py  # macOS/Linux için
-      # Windows için: set FLASK_APP=run.py
+      # macOS/Linux için
+      export FLASK_APP=run.py
+      # Windows için:
+      # set FLASK_APP=run.py
 
-      flask db init
+      flask db init # Eğer daha önce hiç başlatılmadıysa
       flask db migrate -m "initial migration"
       flask db upgrade
       ```
 
-   d. Admin kullanıcısı oluşturun:
+   d. Admin kullanıcısı oluşturun (Eğer `sqlite_kurulum` betikleri kullanılmadıysa veya özel bir admin isteniyorsa):
       ```bash
       flask shell
       ```
-
-      Shell içinde:
+      Shell içinde aşağıdaki Python komutlarını çalıştırın:
       ```python
       from app import db
       from app.models import Personel
 
       admin = Personel(KullaniciAdi="admin", Ad="Admin", Soyad="User", Rol="Admin")
-      admin.set_password("password")
+      admin.set_password("password123") # Güçlü bir şifre belirleyin
       db.session.add(admin)
       db.session.commit()
       exit()
@@ -77,16 +78,18 @@ Bu proje, bir kitabevinin temel operasyonlarını (kitap yönetimi, müşteri y�
       flask run --port 5001
       ```
 
-4. Tarayıcıdan http://127.0.0.1:5001 adresine giderek sisteme erişebilirsiniz:
-   - Kullanıcı Adı: admin
-   - Şifre: password
+4. Tarayıcıdan `http://127.0.0.1:5001` adresine giderek sisteme erişebilirsiniz:
+   - Kullanıcı Adı: `admin` (veya yukarıda belirlediğiniz kullanıcı adı)
+   - Şifre: `password123` (veya yukarıda belirlediğiniz şifre)
 
 ## Veritabanı Şeması
-Proje veritabanı, kitabevi operasyonları için gerekli temel varlıkları ve ilişkileri modellemektedir. Şema, 5. Normal Forma (5NF) uygunluk hedeflenerek tasarlanmıştır.
-- Toplam 8 tablo bulunmaktadır: Yazarlar, Yayinevleri, Kategoriler, Kitaplar, KitapYazarlari, Musteriler, Personeller, Satislar, SatisDetaylari.
+Proje veritabanı, kitabevi operasyonları için gerekli temel varlıkları ve ilişkileri modellemektedir.
+- Desteklenen Veritabanları: SQLite (geliştirme için), PostgreSQL (üretim için önerilir).
+- Şema, ilişkisel model prensiplerine uygun olarak tasarlanmıştır.
+- Toplam 8 ana tablo bulunmaktadır: `Yazarlar`, `Yayinevleri`, `Kategoriler`, `Kitaplar`, `KitapYazarlari` (çok-a-çok ilişki), `Musteriler`, `Personeller`, `Satislar`, `SatisDetaylari`.
 - Tablolar arasında yabancı anahtarlar ile ilişkiler kurulmuştur.
-- Performans ve iş mantığı için Index, View ve Trigger kullanımları eklenmiştir.
-- Veritabanı şeması tanımı `sql_scripts/schema.sql` dosyasında bulunabilir.
+- Performans ve iş mantığı için Index, View (`vw_KitapDetaylari`) ve Trigger (`update_stock_after_sale`) kullanımları eklenmiştir.
+- Detaylı veritabanı şeması tanımı `sql_scripts/schema.sql` dosyasında bulunabilir.
 
 ## Proje Yapısı
 ```
@@ -101,33 +104,28 @@ kitabevi-projesi/
 │   ├── static/             # CSS, JS, resim dosyaları
 │   └── templates/          # HTML şablonları
 ├── migrations/             # Veritabanı migration dosyaları
-├── app.db                  # SQLite veritabanı dosyası (Geliştirme)
 ├── sql_scripts/            # SQL betikleri (PostgreSQL şeması, Index, View, Trigger)
+├── .gitignore              # Git tarafından takip edilmeyecek dosyalar
 ├── config.py               # Yapılandırma ayarları
 ├── requirements.txt        # Gerekli Python kütüphaneleri
 ├── run.py                  # Uygulamayı başlatan script
-└── README.md               # Proje dokümanı
+├── hizli_kurulum.bat       # Windows için hızlı kurulum betiği
+├── hizli_kurulum.sh        # macOS/Linux için hızlı kurulum betiği
+└── README.md               # Bu doküman
 ```
 
 ## Özellikler
-- Kitap katalog yönetimi (kitap, yazar, yayınevi, kategori)
-- Müşteri yönetimi
-- Satış işlemleri (sepet, satış tamamlama, stok güncelleme)
-- Stok takibi (otomatik stok güncellemesi)
-- Kullanıcı (personel) yetkilendirme sistemi
-- Raporlama (satış raporları - PDF özelliği şu an devre dışı)
-- Kitap kapak resmi yükleme ve yönetimi
-- Kitap arama API'si
+- Kapsamlı Kitap Katalog Yönetimi: Kitap, yazar, yayınevi ve kategori ekleme, düzenleme, silme.
+- Müşteri İlişkileri Yönetimi (CRM): Müşteri bilgilerinin kaydı ve takibi.
+- Satış İşlemleri: Kullanıcı dostu sepet mekanizması, satış tamamlama ve fatura (detay) oluşturma.
+- Otomatik Stok Takibi: Satış sonrası otomatik stok güncellemesi ve yetersiz stok uyarıları.
+- Kullanıcı (Personel) Yönetimi ve Yetkilendirme: Farklı rollerde kullanıcılar (Admin, Personel) ve yetki kontrolü.
+- Raporlama: Temel satış raporları. (Not: Gelişmiş PDF raporlama özelliği gelecekte eklenebilir).
+- Kitap Kapak Resmi Yönetimi: Kitaplara kapak resmi yükleme ve görüntüleme.
+- Kitap Arama API'si: Kitapları programatik olarak aramak için bir API endpoint'i.
 
-## Arayüz Görselleri
-Uygulamanın farklı sayfalarına ait ekran görüntüleri bu bölümde veya ayrı bir `screenshots/` dizininde yer almalıdır. README dosyasına görselleri eklemek için markdown formatını kullanabilirsiniz: `![Açıklama](yol/to/gorsel.png)`.
+## Katkıda Bulunma
+Katkılarınız ve önerileriniz için lütfen bir issue açın veya pull request gönderin.
 
-## Proje Raporu
-Proje raporu, IEEE konferans şablonuna uygun olarak hazırlanmalı ve bu depoda `grupno_rapor.pdf` adıyla bulunmalıdır.
-
-## Teslimat Dosyaları
-Proje teslimi için aşağıdaki dosyalar hazırlanmalıdır:
-- Veritabanı dosyaları: `grupno_sql_betikleri.txt` (İçeriği `sql_scripts/schema.sql` dosyasından alınabilir.)
-- Program kodları: `grupno_kaynakkod.txt` (Tüm kaynak kod dosyalarını içermelidir.)
-- Proje raporu: `grupno_rapor.pdf`
-- GitHub bağlantısı: `grupno_github.txt` (Deponuzun URL'sini içermelidir.)
+## Lisans
+Bu proje MIT Lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosyasına bakınız (Eğer eklendiyse).

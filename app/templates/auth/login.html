@@ -13,7 +13,7 @@
                 <h4 class="mb-0 text-center">Giriş Yap</h4>
             </div>
             <div class="card-body p-4">
-                <form action="" method="post">
+                <form action="" method="post" id="loginForm">
                     {{ form.hidden_tag() }}
                     <div class="mb-3">
                         <div class="input-group">
@@ -38,7 +38,7 @@
                         {{ form.remember_me.label(class="form-check-label") }}
                     </div>
                     <div class="d-grid">
-                        {{ form.submit(class="btn btn-primary py-2") }}
+                        {{ form.submit(class="btn btn-primary py-2", id="loginButton") }}
                     </div>
                 </form>
             </div>
@@ -48,4 +48,20 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('loginForm');
+    const loginButton = document.getElementById('loginButton');
+
+    if (loginForm && loginButton) {
+        loginForm.addEventListener('submit', function() {
+            loginButton.disabled = true;
+            loginButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Giriş Yapılıyor...';
+        });
+    }
+});
+</script>
 {% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{{ title }}</h1>
+    <p>Admin paneline hoş geldiniz! Aşağıda sistemle ilgili bazı özet bilgiler ve yönetim bağlantıları bulunmaktadır.</p>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-users me-2"></i>Personel</h5>
+                    <p class="card-text fs-4">{{ personel_sayisi }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-book me-2"></i>Kitap</h5>
+                    <p class="card-text fs-4">{{ kitap_sayisi }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-user-friends me-2"></i>Müşteri</h5>
+                    <p class="card-text fs-4">{{ musteri_sayisi }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-shopping-cart me-2"></i>Satış</h5>
+                    <p class="card-text fs-4">{{ satis_sayisi }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Yönetim Bölümleri</h2>
+    <div class="list-group mt-3">
+        <a href="{{ url_for('admin.personel_listesi') }}" class="list-group-item list-group-item-action">
+            <i class="fas fa-users-cog me-2"></i> Personel Yönetimi
+        </a>
+        <a href="{{ url_for('admin.kitap_listesi') }}" class="list-group-item list-group-item-action">
+            <i class="fas fa-book-medical me-2"></i> Kitap Yönetimi
+        </a>
+        <a href="{{ url_for('admin.kategori_listesi') }}" class="list-group-item list-group-item-action">
+            <i class="fas fa-tags me-2"></i> Kategori Yönetimi
+        </a>
+        <a href="{{ url_for('admin.yayinevi_listesi') }}" class="list-group-item list-group-item-action">
+            <i class="fas fa-building me-2"></i> Yayınevi Yönetimi
+        </a>
+        <a href="{{ url_for('admin.musteri_listesi') }}" class="list-group-item list-group-item-action">
+            <i class="fas fa-address-book me-2"></i> Müşteri Yönetimi
+        </a>
+        <a href="{{ url_for('admin.satis_raporlari') }}" class="list-group-item list-group-item-action">
+            <i class="fas fa-chart-line me-2"></i> Satış Raporları
+        </a>
+    </div>
+{% endblock %} 

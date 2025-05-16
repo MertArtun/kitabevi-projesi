@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ title }}</h1>
+<div class="table-responsive">
+<table class="table table-striped table-hover">
+<thead class="table-dark"><tr><th>ID</th><th>Ad</th><th>Soyad</th><th>Email</th><th>Telefon</th><th>Kayıt Tarihi</th><th>Satış Sayısı</th></tr></thead>
+<tbody>
+{% for m in musteriler %}
+<tr><td>{{ m.MusteriID }}</td><td>{{ m.Ad }}</td><td>{{ m.Soyad }}</td><td>{{ m.Email or '' }}</td><td>{{ m.Telefon or '' }}</td><td>{{ m.KayitTarihi.strftime('%Y-%m-%d') }}</td><td>{{ m.satislar.count() }}</td></tr>
+{% else %}
+<tr><td colspan="7" class="text-center">Müşteri yok.</td></tr>
+{% endfor %}
+</tbody></table></div>
+{% endblock %} 

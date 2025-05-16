@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<div class="table-responsive">
+<table class="table table-striped table-hover">
+<thead class="table-dark">
+<tr>
+<th>ID</th><th>ISBN</th><th>Ad</th><th>Yazarlar</th><th>Yayınevi</th><th>Kategori</th><th>Stok</th>
+</tr>
+</thead>
+<tbody>
+{% for kitap in kitaplar %}
+<tr>
+<td>{{ kitap.KitapID }}</td>
+<td>{{ kitap.ISBN }}</td>
+<td>{{ kitap.Ad }}</td>
+<td>
+{% for y in kitap.yazarlar %}{{ y.Ad }} {{ y.Soyad }}{% if not loop.last %}, {% endif %}{% endfor %}
+</td>
+<td>{{ kitap.yayinevi.Ad }}</td>
+<td>{{ kitap.kategori.Ad }}</td>
+<td>{{ kitap.StokAdedi }}</td>
+</tr>
+{% else %}
+<tr><td colspan="7" class="text-center">Kayıtlı kitap bulunamadı.</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %} 

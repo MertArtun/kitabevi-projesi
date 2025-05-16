@@ -7,5 +7,7 @@ psycopg2-binary==2.9.6
 Werkzeug==2.2.3
 python-dotenv==1.0.0
 email-validator==2.0.0
-10| gunicorn # WSGI sunucusu
-11| Faker # Örnek veri üretimi için
+gunicorn # WSGI sunucusu
+Faker # Örnek veri üretimi için
+Bootstrap-Flask==2.5.0 # Bootstrap 5 entegrasyonuPillow==10.3.0
+Pillow==10.3.0

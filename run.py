@@ -1,4 +1,6 @@
 # filepath: /Users/halitartun/Desktop/kitabevi-projesi/run.py
+import sys
+print(f"SYS.PATH: {sys.path}")
 from app import create_app, db
 # from app.ilk_veriler import ekle_veriler # Bu satırı değiştirin
 from ilk_veriler import ekle_veriler      # Bu şekilde değiştirin

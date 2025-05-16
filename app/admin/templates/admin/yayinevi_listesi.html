@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ title }}</h1>
+<div class="table-responsive">
+<table class="table table-striped table-hover">
+<thead class="table-dark"><tr><th>ID</th><th>Ad</th><th>Telefon</th><th>Adres</th><th>Kitap Sayısı</th></tr></thead>
+<tbody>
+{% for y in yayinevleri %}
+<tr><td>{{ y.YayineviID }}</td><td>{{ y.Ad }}</td><td>{{ y.Telefon or '' }}</td><td>{{ y.Adres or '' }}</td><td>{{ y.kitaplar.count() }}</td></tr>
+{% else %}
+<tr><td colspan="5" class="text-center">Yayınevi yok.</td></tr>
+{% endfor %}
+</tbody></table></div>
+{% endblock %} 
