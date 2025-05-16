@@ -20,12 +20,10 @@ Bu proje, bir kitabevinin temel operasyonlarını (kitap yönetimi, müşteri y�
 
 2. SQLite kurulum betiğini çalıştırın (Opsiyonel, manuel kurulum adımları aşağıdadır):
    ```bash
-   # macOS/Linux için
    chmod +x sqlite_kurulum.sh
    ./sqlite_kurulum.sh
 
-   # Windows için
-   # sqlite_kurulum.bat dosyasını çalıştırın
+   sqlite_kurulum.bat
    ```
 
 3. Veya manuel olarak kurulum yapın:
@@ -33,10 +31,8 @@ Bu proje, bir kitabevinin temel operasyonlarını (kitap yönetimi, müşteri y�
       ```bash
       python -m venv venv
 
-      # Windows
-      venv\\Scripts\\activate
+      venv\Scripts\activate
 
-      # macOS/Linux
       source venv/bin/activate
       ```
 
@@ -47,12 +43,11 @@ Bu proje, bir kitabevinin temel operasyonlarını (kitap yönetimi, müşteri y�
 
    c. Veritabanını oluşturun ve migrate edin:
       ```bash
-      # macOS/Linux için
       export FLASK_APP=run.py
-      # Windows için:
-      # set FLASK_APP=run.py
+      
+      set FLASK_APP=run.py
 
-      flask db init # Eğer daha önce hiç başlatılmadıysa
+      flask db init
       flask db migrate -m "initial migration"
       flask db upgrade
       ```
@@ -67,7 +62,7 @@ Bu proje, bir kitabevinin temel operasyonlarını (kitap yönetimi, müşteri y�
       from app.models import Personel
 
       admin = Personel(KullaniciAdi="admin", Ad="Admin", Soyad="User", Rol="Admin")
-      admin.set_password("password123") # Güçlü bir şifre belirleyin
+      admin.set_password("password123")
       db.session.add(admin)
       db.session.commit()
       exit()
@@ -120,7 +115,7 @@ kitabevi-projesi/
 - Satış İşlemleri: Kullanıcı dostu sepet mekanizması, satış tamamlama ve fatura (detay) oluşturma.
 - Otomatik Stok Takibi: Satış sonrası otomatik stok güncellemesi ve yetersiz stok uyarıları.
 - Kullanıcı (Personel) Yönetimi ve Yetkilendirme: Farklı rollerde kullanıcılar (Admin, Personel) ve yetki kontrolü.
-- Raporlama: Temel satış raporları. (Not: Gelişmiş PDF raporlama özelliği gelecekte eklenebilir).
+- Raporlama: Temel satış raporları.
 - Kitap Kapak Resmi Yönetimi: Kitaplara kapak resmi yükleme ve görüntüleme.
 - Kitap Arama API'si: Kitapları programatik olarak aramak için bir API endpoint'i.
 
@@ -128,4 +123,4 @@ kitabevi-projesi/
 Katkılarınız ve önerileriniz için lütfen bir issue açın veya pull request gönderin.
 
 ## Lisans
-Bu proje MIT Lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosyasına bakınız (Eğer eklendiyse).
+Bu proje MIT Lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosyasına bakınız.
